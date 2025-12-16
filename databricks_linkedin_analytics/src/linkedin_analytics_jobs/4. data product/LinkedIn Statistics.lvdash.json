@@ -1,0 +1,2834 @@
+{
+  "datasets": [
+    {
+      "name": "bea9d2f0",
+      "displayName": "dim_date",
+      "queryLines": [
+        "SELECT * FROM gold.linkedin.dim_date"
+      ]
+    },
+    {
+      "name": "d4e3c8c9",
+      "displayName": "dim_timestamp",
+      "queryLines": [
+        "SELECT * FROM gold.linkedin.dim_timestamp"
+      ]
+    },
+    {
+      "name": "c2b17097",
+      "displayName": "fct_daily_post_statistics",
+      "queryLines": [
+        "SELECT * FROM gold.linkedin.fct_daily_post_statistics"
+      ]
+    },
+    {
+      "name": "79027dcc",
+      "displayName": "fct_daily_profile_statistics",
+      "queryLines": [
+        "SELECT \r\n",
+        "    CAST(analytics_date AS DATE) AS analytics_date,\r\n",
+        "    new_followers,\r\n",
+        "    impressions,\r\n",
+        "    engagements,\r\n",
+        "    change_in_impressions,\r\n",
+        "    change_in_engagements\r\n",
+        "FROM gold.linkedin.fct_daily_profile_statistics"
+      ]
+    },
+    {
+      "name": "2df03904",
+      "displayName": "enriched_daily_posts",
+      "queryLines": [
+        "WITH avg_stats_by_weekday AS (\r\n",
+        "    SELECT \r\n",
+        "        AVG(impressions) AS avg_impressions_by_weekday, \r\n",
+        "        AVG(engagements) AS avg_engagements_by_weekday, \r\n",
+        "        weekday\r\n",
+        "    FROM gold.linkedin.fct_daily_post_statistics daily_stats\r\n",
+        "    LEFT JOIN gold.linkedin.dim_date dim_date\r\n",
+        "    ON daily_stats.analytics_date = dim_date.date\r\n",
+        "    WHERE post_id = 'total'\r\n",
+        "    GROUP BY weekday\r\n",
+        ")\r\n",
+        "SELECT \r\n",
+        "    post_id, \r\n",
+        "    post_publish_date, \r\n",
+        "    post_publish_timestamp, \r\n",
+        "    impressions, \r\n",
+        "    engagements, \r\n",
+        "    avg_impressions_by_weekday,\r\n",
+        "    avg_engagements_by_weekday,\r\n",
+        "    CAST(analytics_date AS DATE) AS analytics_date, \r\n",
+        "    day as analytics_day,\r\n",
+        "    month as analytics_month,\r\n",
+        "    year as analytics_year, \r\n",
+        "    week as analytics_week,\r\n",
+        "    CONCAT(\r\n",
+        "      dim_date.weekday, ' ', dim_date.weekday_str\r\n",
+        "    ) AS analytics_weekday,\r\n",
+        "    is_weekend as analytics_is_weekend, \r\n",
+        "    days_since_post, \r\n",
+        "    COALESCE(change_in_impressions, 0) AS change_in_impressions,\r\n",
+        "    COALESCE(change_in_engagements, 0) AS change_in_engagements, \r\n",
+        "    title, \r\n",
+        "    content\r\n",
+        "FROM gold.linkedin.fct_daily_post_statistics daily_stats\r\n",
+        "LEFT JOIN gold.linkedin.dim_date dim_date\r\n",
+        "ON daily_stats.analytics_date = dim_date.date\r\n",
+        "LEFT JOIN avg_stats_by_weekday\r\n",
+        "ON dim_date.weekday = avg_stats_by_weekday.weekday"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "098af8f3",
+      "displayName": "Summary",
+      "layout": [
+        {
+          "widget": {
+            "name": "c49c585e",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "analytics_weekday",
+                      "expression": "`analytics_weekday`"
+                    },
+                    {
+                      "name": "avg(engagements)",
+                      "expression": "AVG(`engagements`)"
+                    },
+                    {
+                      "name": "avg(impressions)",
+                      "expression": "AVG(`impressions`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`post_id` IS NULL OR `post_id` NOT IN ('total', 'others')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "combo",
+              "encodings": {
+                "color": {
+                  "legend": {
+                    "position": "bottom"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "avg(engagements)"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideGrid": true
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "avg(impressions)"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideGrid": true
+                    }
+                  }
+                },
+                "x": {
+                  "fieldName": "analytics_weekday",
+                  "axis": {
+                    "title": "Day of week",
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              },
+              "frame": {
+                "title": "Average Post Statistics by Weekday",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 3,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "29502871",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "daily(analytics_date)",
+                      "expression": "DATE_TRUNC(\"DAY\", `analytics_date`)"
+                    },
+                    {
+                      "name": "sum(engagements)",
+                      "expression": "SUM(`engagements`)"
+                    },
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`post_id` IS NULL OR `post_id` NOT IN ('total')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "combo",
+              "encodings": {
+                "x": {
+                  "fieldName": "daily(analytics_date)",
+                  "axis": {
+                    "hideTitle": true,
+                    "hideGrid": true
+                  },
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(engagements)"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideGrid": true
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(impressions)"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideGrid": true,
+                      "hideTitle": false
+                    }
+                  }
+                },
+                "color": {
+                  "legend": {
+                    "position": "bottom"
+                  }
+                }
+              },
+              "frame": {
+                "title": "Daily Total Statistics",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 3,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "c4fd79ef",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "days_since_post",
+                      "expression": "`days_since_post`"
+                    },
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    },
+                    {
+                      "name": "post_id",
+                      "expression": "`post_id`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`post_id` IS NULL OR `post_id` NOT IN ('total')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(impressions)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "post_id",
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "color": {
+                  "fieldName": "days_since_post",
+                  "displayName": "Days since post",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "blues"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ranked Daily Posts by Impressions"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 10,
+            "width": 6,
+            "height": 7
+          }
+        },
+        {
+          "widget": {
+            "name": "8d23863c",
+            "queries": [
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_days_since_post",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "min(days_since_post)",
+                      "expression": "MIN(`days_since_post`)"
+                    },
+                    {
+                      "name": "max(days_since_post)",
+                      "expression": "MAX(`days_since_post`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "range-slider",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "days_since_post",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_days_since_post"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Days since post"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 9,
+            "width": 3,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "cef28e9f",
+            "queries": [
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_analytics_date",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "analytics_date",
+                      "expression": "`analytics_date`"
+                    },
+                    {
+                      "name": "analytics_date_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f83419e7a9907b6d2956dd64_analytics_date",
+                "query": {
+                  "datasetName": "79027dcc",
+                  "fields": [
+                    {
+                      "name": "analytics_date",
+                      "expression": "`analytics_date`"
+                    },
+                    {
+                      "name": "analytics_date_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "analytics_date",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_analytics_date"
+                  },
+                  {
+                    "fieldName": "analytics_date",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f83419e7a9907b6d2956dd64_analytics_date"
+                  }
+                ]
+              },
+              "selection": {
+                "defaultSelection": {
+                  "range": {
+                    "dataType": "DATE",
+                    "min": {
+                      "value": "now-7d/d"
+                    },
+                    "max": {
+                      "value": "now/d"
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Date of analysis"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "a5841c81",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "79027dcc",
+                  "fields": [
+                    {
+                      "name": "min(impressions)",
+                      "expression": "MIN(`impressions`)"
+                    },
+                    {
+                      "name": "max(impressions)",
+                      "expression": "MAX(`impressions`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(impressions)"
+                },
+                "target": {
+                  "fieldName": "min(impressions)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Highest and lowest daily impressions"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 3,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "69b5919c",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "79027dcc",
+                  "fields": [
+                    {
+                      "name": "min(engagements)",
+                      "expression": "MIN(`engagements`)"
+                    },
+                    {
+                      "name": "max(engagements)",
+                      "expression": "MAX(`engagements`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "max(engagements)"
+                },
+                "target": {
+                  "fieldName": "min(engagements)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Highest and lowest daily engagements"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 1,
+            "width": 3,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "180e9a6d",
+      "displayName": "Global Filters",
+      "layout": [
+        {
+          "widget": {
+            "name": "232133be",
+            "queries": [
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_post_publish_date",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "post_publish_date",
+                      "expression": "`post_publish_date`"
+                    },
+                    {
+                      "name": "post_publish_date_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-date-range-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "post_publish_date",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_post_publish_date"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Date of posts"
+              },
+              "selection": {
+                "defaultSelection": {
+                  "range": {
+                    "dataType": "DATE",
+                    "min": {
+                      "value": "2025-08-01T00:00:00.000"
+                    },
+                    "max": {
+                      "value": "2040-10-06T23:59:59.999"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_GLOBAL_FILTERS"
+    },
+    {
+      "name": "ba834e49",
+      "displayName": "By post",
+      "layout": [
+        {
+          "widget": {
+            "name": "44497927",
+            "queries": [
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_post_id",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "post_id",
+                      "expression": "`post_id`"
+                    },
+                    {
+                      "name": "post_id_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f7de1f9aaa03c1349e9c6c1b_post_id",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "post_id",
+                      "expression": "`post_id`"
+                    },
+                    {
+                      "name": "post_id_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "post_id",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_post_id"
+                  },
+                  {
+                    "fieldName": "post_id",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f7de1f9aaa03c1349e9c6c1b_post_id"
+                  }
+                ]
+              },
+              "disallowAll": true,
+              "scale": {
+                "type": "categorical",
+                "sort": {
+                  "by": "natural-order-reversed"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Selected post"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 3,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "cc5eefbe",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "daily(analytics_date)",
+                      "expression": "DATE_TRUNC(\"DAY\", `analytics_date`)"
+                    },
+                    {
+                      "name": "engagements",
+                      "expression": "`engagements`"
+                    },
+                    {
+                      "name": "impressions",
+                      "expression": "`impressions`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "combo",
+              "encodings": {
+                "x": {
+                  "fieldName": "daily(analytics_date)",
+                  "axis": {
+                    "hideGrid": true,
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "color": {
+                  "legend": {
+                    "position": "bottom"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "engagements"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideGrid": true
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "impressions"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideTitle": false,
+                      "hideGrid": true,
+                      "hideLabels": false
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Historical post performance"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 6,
+            "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "e743bfe7",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "daily(analytics_date)",
+                      "expression": "DATE_TRUNC(\"DAY\", `analytics_date`)"
+                    },
+                    {
+                      "name": "engagements",
+                      "expression": "`engagements`"
+                    },
+                    {
+                      "name": "impressions",
+                      "expression": "`impressions`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "combo",
+              "encodings": {
+                "x": {
+                  "fieldName": "daily(analytics_date)",
+                  "axis": {
+                    "hideGrid": true,
+                    "hideLabels": false,
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "color": {
+                  "legend": {
+                    "position": "bottom"
+                  }
+                },
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "engagements"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideGrid": true
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "impressions"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideTitle": false,
+                      "hideGrid": true,
+                      "hideLabels": false
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Post performance filtered by days since post"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 2,
+            "height": 9
+          }
+        },
+        {
+          "widget": {
+            "name": "c84be80d",
+            "queries": [
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_days_since_post",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "min(days_since_post)",
+                      "expression": "MIN(`days_since_post`)"
+                    },
+                    {
+                      "name": "max(days_since_post)",
+                      "expression": "MAX(`days_since_post`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "range-slider",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "days_since_post",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_days_since_post"
+                  }
+                ]
+              },
+              "selection": {
+                "defaultSelection": {
+                  "range": {
+                    "dataType": "INTEGER",
+                    "min": {
+                      "value": ""
+                    },
+                    "max": {
+                      "value": "3"
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Days since post"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "d38d694a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "analytics_weekday",
+                      "expression": "`analytics_weekday`"
+                    },
+                    {
+                      "name": "title",
+                      "expression": "`title`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "IN_RANGE(`days_since_post`, 0, 0)"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "analytics_weekday",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100010,
+                    "title": "weekday",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  },
+                  {
+                    "fieldName": "title",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100015,
+                    "title": "title",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false
+                  }
+                ]
+              },
+              "invisibleColumns": [
+                {
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "post_id",
+                  "type": "string",
+                  "displayAs": "string",
+                  "order": 100000,
+                  "title": "post_id",
+                  "allowSearch": false,
+                  "alignContent": "left",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "dateTimeFormat": "DD/MM/YYYY",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "post_publish_date",
+                  "type": "date",
+                  "displayAs": "datetime",
+                  "order": 100001,
+                  "title": "post_publish_date",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "dateTimeFormat": "DD/MM/YYYY HH:mm:ss.SSS",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "post_publish_timestamp",
+                  "type": "datetime",
+                  "displayAs": "datetime",
+                  "order": 100002,
+                  "title": "post_publish_timestamp",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "impressions",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100003,
+                  "title": "impressions",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "engagements",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100004,
+                  "title": "engagements",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "dateTimeFormat": "DD/MM/YYYY",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_date",
+                  "type": "date",
+                  "displayAs": "datetime",
+                  "order": 100005,
+                  "title": "analytics_date",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_day",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100006,
+                  "title": "analytics_day",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_month",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100007,
+                  "title": "analytics_month",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_year",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100008,
+                  "title": "analytics_year",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_week",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100009,
+                  "title": "analytics_week",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_is_weekend",
+                  "type": "boolean",
+                  "displayAs": "boolean",
+                  "order": 100011,
+                  "title": "analytics_is_weekend",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "days_since_post",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100012,
+                  "title": "days_since_post",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "change_in_impressions",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100013,
+                  "title": "change_in_impressions",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "change_in_engagements",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100014,
+                  "title": "change_in_engagements",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "content",
+                  "type": "string",
+                  "displayAs": "string",
+                  "order": 100016,
+                  "title": "content",
+                  "allowSearch": false,
+                  "alignContent": "left",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                }
+              ],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false,
+              "frame": {
+                "showTitle": true,
+                "title": "Post metadata"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 5,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "56b6633d",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "content",
+                      "expression": "`content`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "IN_RANGE(`days_since_post`, 0, 0)"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "content",
+                    "booleanValues": [
+                      "false",
+                      "true"
+                    ],
+                    "imageUrlTemplate": "{{ @ }}",
+                    "imageTitleTemplate": "{{ @ }}",
+                    "imageWidth": "",
+                    "imageHeight": "",
+                    "linkUrlTemplate": "{{ @ }}",
+                    "linkTextTemplate": "{{ @ }}",
+                    "linkTitleTemplate": "{{ @ }}",
+                    "linkOpenInNewTab": true,
+                    "type": "string",
+                    "displayAs": "string",
+                    "visible": true,
+                    "order": 100016,
+                    "title": "content",
+                    "allowSearch": false,
+                    "alignContent": "left",
+                    "allowHTML": false,
+                    "highlightLinks": false,
+                    "useMonospaceFont": false,
+                    "preserveWhitespace": false,
+                    "cellFormat": {
+                      "default": {
+                        "foregroundColor": null
+                      },
+                      "rules": []
+                    }
+                  }
+                ]
+              },
+              "invisibleColumns": [
+                {
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "post_id",
+                  "type": "string",
+                  "displayAs": "string",
+                  "order": 100000,
+                  "title": "post_id",
+                  "allowSearch": false,
+                  "alignContent": "left",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "dateTimeFormat": "DD/MM/YYYY",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "post_publish_date",
+                  "type": "date",
+                  "displayAs": "datetime",
+                  "order": 100001,
+                  "title": "post_publish_date",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "dateTimeFormat": "DD/MM/YYYY HH:mm:ss.SSS",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "post_publish_timestamp",
+                  "type": "datetime",
+                  "displayAs": "datetime",
+                  "order": 100002,
+                  "title": "post_publish_timestamp",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "impressions",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100003,
+                  "title": "impressions",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "engagements",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100004,
+                  "title": "engagements",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "dateTimeFormat": "DD/MM/YYYY",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_date",
+                  "type": "date",
+                  "displayAs": "datetime",
+                  "order": 100005,
+                  "title": "analytics_date",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_day",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100006,
+                  "title": "analytics_day",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_month",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100007,
+                  "title": "analytics_month",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_year",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100008,
+                  "title": "analytics_year",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_week",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100009,
+                  "title": "analytics_week",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_weekday",
+                  "type": "string",
+                  "displayAs": "string",
+                  "order": 100010,
+                  "title": "weekday",
+                  "allowSearch": false,
+                  "alignContent": "left",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "analytics_is_weekend",
+                  "type": "boolean",
+                  "displayAs": "boolean",
+                  "order": 100011,
+                  "title": "analytics_is_weekend",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "days_since_post",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100012,
+                  "title": "days_since_post",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "change_in_impressions",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100013,
+                  "title": "change_in_impressions",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "numberFormat": "0",
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "change_in_engagements",
+                  "type": "integer",
+                  "displayAs": "number",
+                  "order": 100014,
+                  "title": "change_in_engagements",
+                  "allowSearch": false,
+                  "alignContent": "right",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                },
+                {
+                  "booleanValues": [
+                    "false",
+                    "true"
+                  ],
+                  "imageUrlTemplate": "{{ @ }}",
+                  "imageTitleTemplate": "{{ @ }}",
+                  "imageWidth": "",
+                  "imageHeight": "",
+                  "linkUrlTemplate": "{{ @ }}",
+                  "linkTextTemplate": "{{ @ }}",
+                  "linkTitleTemplate": "{{ @ }}",
+                  "linkOpenInNewTab": true,
+                  "name": "title",
+                  "type": "string",
+                  "displayAs": "string",
+                  "order": 100015,
+                  "title": "title",
+                  "allowSearch": false,
+                  "alignContent": "left",
+                  "allowHTML": false,
+                  "highlightLinks": false,
+                  "useMonospaceFont": false,
+                  "preserveWhitespace": false
+                }
+              ],
+              "allowHTMLByDefault": false,
+              "itemsPerPage": 25,
+              "paginationSize": "default",
+              "condensed": true,
+              "withRowNumber": false,
+              "firstNFrozenColumns": 0,
+              "frame": {
+                "showTitle": false,
+                "title": "Post metadata"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 7,
+            "width": 4,
+            "height": 10
+          }
+        },
+        {
+          "widget": {
+            "name": "1398a87a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(impressions)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total impressions"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 0,
+            "width": 1,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "9d9e9acd",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "sum(engagements)",
+                      "expression": "SUM(`engagements`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(engagements)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total engagements"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "66570480",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(impressions)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Impressions filtered by days since post"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "7d210aca",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "sum(engagements)",
+                      "expression": "SUM(`engagements`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(engagements)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Engagements filtered by days since post"
+              }
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 6,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "3982d302",
+      "displayName": "By day",
+      "layout": [
+        {
+          "widget": {
+            "name": "e43e3e0d",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`post_id` IN ('total')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(impressions)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total impressions"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 1,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "f6d6a1f8",
+            "queries": [
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f7de1f9aaa03c1349e9c6c1b_daily(analytics_date)",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "daily(analytics_date)",
+                      "expression": "DATE_TRUNC(\"DAY\", `analytics_date`)"
+                    },
+                    {
+                      "name": "daily(analytics_date)_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f72a1aacbcb7cc50f4c4c62e_daily(date)",
+                "query": {
+                  "datasetName": "bea9d2f0",
+                  "fields": [
+                    {
+                      "name": "daily(date)",
+                      "expression": "DATE_TRUNC(\"DAY\", `date`)"
+                    },
+                    {
+                      "name": "daily(date)_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              },
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_daily(analytics_date)",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "daily(analytics_date)",
+                      "expression": "DATE_TRUNC(\"DAY\", `analytics_date`)"
+                    },
+                    {
+                      "name": "daily(analytics_date)_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "filter-date-picker",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "daily(analytics_date)",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f7de1f9aaa03c1349e9c6c1b_daily(analytics_date)"
+                  },
+                  {
+                    "fieldName": "daily(date)",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f72a1aacbcb7cc50f4c4c62e_daily(date)"
+                  },
+                  {
+                    "fieldName": "daily(analytics_date)",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_daily(analytics_date)"
+                  }
+                ]
+              },
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "DATETIME",
+                    "values": [
+                      {
+                        "value": "now-1d/d"
+                      }
+                    ]
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Date of analysis"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "60580f07",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "bea9d2f0",
+                  "fields": [
+                    {
+                      "name": "weekday_str",
+                      "expression": "`weekday_str`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "weekday_str"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Day of week"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 0,
+            "width": 2,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "984602ef",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "sum(engagements)",
+                      "expression": "SUM(`engagements`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`post_id` IN ('total')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "sum(engagements)"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Total engagements"
+              }
+            }
+          },
+          "position": {
+            "x": 1,
+            "y": 1,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "17edb404",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    },
+                    {
+                      "name": "sum(engagements)",
+                      "expression": "SUM(`engagements`)"
+                    },
+                    {
+                      "name": "post_id",
+                      "expression": "`post_id`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`post_id` IS NULL OR `post_id` NOT IN ('total')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "fields": [
+                    {
+                      "fieldName": "sum(impressions)"
+                    },
+                    {
+                      "fieldName": "sum(engagements)"
+                    }
+                  ],
+                  "axis": {
+                    "hideLabels": true,
+                    "hideGrid": true,
+                    "hideTitle": true
+                  }
+                },
+                "y": {
+                  "fieldName": "post_id",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Statistics on date of analysis",
+                "showDescription": false
+              },
+              "mark": {
+                "layout": "group"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 6,
+            "height": 11
+          }
+        },
+        {
+          "widget": {
+            "name": "2bee1dba",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    },
+                    {
+                      "name": "sum(engagements)",
+                      "expression": "SUM(`engagements`)"
+                    },
+                    {
+                      "name": "post_id",
+                      "expression": "`post_id`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`post_id` IS NULL OR `post_id` NOT IN ('total')"
+                    },
+                    {
+                      "expression": "IN_RANGE(`days_since_post`, 0, 0)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fields": [
+                    {
+                      "fieldName": "sum(impressions)"
+                    },
+                    {
+                      "fieldName": "sum(engagements)"
+                    }
+                  ],
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "axis": {
+                    "hideGrid": true,
+                    "hideLabels": true,
+                    "hideTitle": true
+                  }
+                },
+                "y": {
+                  "fieldName": "post_id",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Posts on this day",
+                "showDescription": false
+              },
+              "mark": {
+                "layout": "group"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 0,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "3aec9f02",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "avg_impressions_by_weekday",
+                      "expression": "`avg_impressions_by_weekday`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg_impressions_by_weekday"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Average impressions on day of week"
+              }
+            }
+          },
+          "position": {
+            "x": 2,
+            "y": 1,
+            "width": 1,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "2f8941b8",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "avg_engagements_by_weekday",
+                      "expression": "`avg_engagements_by_weekday`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg_engagements_by_weekday"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Average engagements on day of week"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 1,
+            "width": 1,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "5edbe3dd",
+      "displayName": "Historical",
+      "layout": [
+        {
+          "widget": {
+            "name": "a329a5bc",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "79027dcc",
+                  "fields": [
+                    {
+                      "name": "daily(analytics_date)",
+                      "expression": "DATE_TRUNC(\"DAY\", `analytics_date`)"
+                    },
+                    {
+                      "name": "sum(engagements)",
+                      "expression": "SUM(`engagements`)"
+                    },
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "combo",
+              "encodings": {
+                "y": {
+                  "primary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(engagements)"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideGrid": true,
+                      "hideTitle": true,
+                      "hideLabels": true
+                    }
+                  },
+                  "secondary": {
+                    "fields": [
+                      {
+                        "fieldName": "sum(impressions)"
+                      }
+                    ],
+                    "scale": {
+                      "type": "quantitative"
+                    },
+                    "axis": {
+                      "hideGrid": true,
+                      "hideTitle": true,
+                      "hideLabels": true
+                    }
+                  }
+                },
+                "color": {
+                  "legend": {
+                    "position": "bottom",
+                    "hideTitle": true,
+                    "hide": true
+                  }
+                },
+                "x": {
+                  "fieldName": "daily(analytics_date)",
+                  "axis": {
+                    "hideLabels": false,
+                    "hideTitle": true,
+                    "hideGrid": true
+                  },
+                  "scale": {
+                    "type": "temporal"
+                  }
+                }
+              },
+              "frame": {
+                "title": "Historical Post Statistics",
+                "showTitle": true
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 6,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "11d2a5cd",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "days_since_post",
+                      "expression": "`days_since_post`"
+                    },
+                    {
+                      "name": "sum(impressions)",
+                      "expression": "SUM(`impressions`)"
+                    },
+                    {
+                      "name": "post_id",
+                      "expression": "`post_id`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`post_id` IS NULL OR `post_id` NOT IN ('total')"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sum(impressions)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "post_id",
+                  "axis": {
+                    "hideTitle": true
+                  },
+                  "scale": {
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
+                  }
+                },
+                "color": {
+                  "fieldName": "days_since_post",
+                  "displayName": "Days since post",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "blues"
+                    }
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Ranked Historical Posts by Impressions",
+                "showDescription": false
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 4,
+            "width": 6,
+            "height": 13
+          }
+        },
+        {
+          "widget": {
+            "name": "2bb1d9a4",
+            "queries": [
+              {
+                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f7de1f9aaa03c1349e9c6c1b_days_since_post",
+                "query": {
+                  "datasetName": "c2b17097",
+                  "fields": [
+                    {
+                      "name": "min(days_since_post)",
+                      "expression": "MIN(`days_since_post`)"
+                    },
+                    {
+                      "name": "max(days_since_post)",
+                      "expression": "MAX(`days_since_post`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "range-slider",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "days_since_post",
+                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c222f7de1f9aaa03c1349e9c6c1b_days_since_post"
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Days since post"
+              },
+              "selection": {
+                "defaultSelection": {
+                  "range": {
+                    "dataType": "INTEGER",
+                    "min": {
+                      "value": ""
+                    },
+                    "max": {
+                      "value": "3"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 3,
+            "height": 1
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}

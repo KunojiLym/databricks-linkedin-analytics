@@ -1,0 +1,279 @@
+resources:
+  jobs:
+    linkedin_transformation:
+      name: linkedin transformation
+      tasks:
+        - task_key: silver_engagements_transformation
+          notebook_task:
+            base_parameters:
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_ENGAGEMENTS_TABLE_PREFIX: ${var.bronze_staging_engagements_prefix}
+              BRONZE_TOTALS_TABLE: ${var.bronze_profile_metrics_table}
+
+              SILVER_CATALOG: ${var.silver_catalog}
+              SILVER_SCHEMA: ${resources.schemas.silver.name}
+              SILVER_ENGAGEMENTS_TABLE: ${var.silver_post_engagements}
+            notebook_path: ../src/linkedin_analytics_jobs/2. silver transformation/silver engagements consolidation.ipynb
+            source: WORKSPACE
+        - task_key: silver_impressions_transformation
+          notebook_task:
+            base_parameters:
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_IMPRESSIONS_TABLE_PREFIX: ${var.bronze_staging_impressions_prefix}
+              BRONZE_TOTALS_TABLE: ${var.bronze_profile_metrics_table}
+
+              SILVER_CATALOG: ${var.silver_catalog}
+              SILVER_SCHEMA: ${resources.schemas.silver.name}
+              SILVER_IMPRESSIONS_TABLE: ${var.silver_post_impressions}
+            notebook_path: ../src/linkedin_analytics_jobs/2. silver transformation/silver impressions consolidation.ipynb
+            source: WORKSPACE
+        - task_key: silver_views_update
+          notebook_task:
+            base_parameters:
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_FOLLOWERS_TABLE: ${var.bronze_profile_followers_table}
+              BRONZE_TOTALS_TABLE: ${var.bronze_profile_metrics_table}
+
+              SILVER_CATALOG: ${var.silver_catalog}
+              SILVER_SCHEMA: ${resources.schemas.silver.name}
+              SILVER_FOLLOWERS_TABLE: ${var.silver_profile_followers}
+              SILVER_TOTALS_TABLE: ${var.silver_profile_metrics}
+            notebook_path: ../src/linkedin_analytics_jobs/2. silver transformation/silver views update.ipynb
+            source: WORKSPACE
+        - task_key: silver_posts_enrichment
+          notebook_task:
+            base_parameters:
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_POSTS_TABLE: ${var.bronze_post_metrics_table}
+              BRONZE_POST_DETAILS_TABLE:  ${var.bronze_post_metadata_table}
+              BRONZE_POST_PATCH_TABLE: ${var.bronze_post_patch_table}
+
+              SILVER_CATALOG: ${var.silver_catalog}
+              SILVER_SCHEMA: ${resources.schemas.silver.name}
+              SILVER_POSTS_TABLE: ${var.silver_post_metadata}
+            notebook_path: ../src/linkedin_analytics_jobs/2. silver transformation/silver post enrichment.ipynb
+            source: WORKSPACE
+        - task_key: gold_refresh
+          depends_on:
+            - task_key: silver_engagements_transformation
+            - task_key: silver_impressions_transformation
+            - task_key: silver_posts_enrichment
+            - task_key: silver_views_update
+          notebook_task:
+            base_parameters:
+              GOLD_CATALOG: ${var.gold_catalog}
+              GOLD_SCHEMA:  ${resources.schemas.gold.name}
+              FCT_DAILY_POSTS_STATS_TABLE: ${var.gold_fact_daily_post_statistics_table}
+              FCT_DAILY_PROFILE_STATS_TABLE: ${var.gold_fact_daily_profile_statistics_table}
+              DIM_DATE_TABLE: ${var.gold_dimension_date_table}
+              DIM_TIMESTAMP_TABLE: ${var.gold_dimension_timestamp_table}
+            notebook_path: ../src/linkedin_analytics_jobs/3. gold modelling/gold materialized views refresh.ipynb
+            source: WORKSPACE
+          max_retries: 2
+          min_retry_interval_millis: 60000
+          retry_on_timeout: true
+        - task_key: gold_create
+          depends_on:
+            - task_key: gold_refresh
+          notebook_task:
+            base_parameters:
+              SILVER_CATALOG: ${var.silver_catalog}
+              SILVER_SCHEMA: ${resources.schemas.silver.name}
+              SILVER_IMPRESSIONS_TABLE: ${var.silver_post_impressions}
+              SILVER_ENGAGEMENTS_TABLE: ${var.silver_post_engagements}
+              SILVER_POSTS_TABLE: ${var.silver_post_metadata}
+              SILVER_FOLLOWERS_TABLE: ${var.silver_profile_followers}
+              SILVER_TOTALS_TABLE: ${var.silver_profile_metrics}
+
+              GOLD_CATALOG: ${var.gold_catalog}
+              GOLD_SCHEMA:  ${resources.schemas.gold.name}
+              FCT_DAILY_POSTS_STATS_TABLE: ${var.gold_fact_daily_post_statistics_table}
+              FCT_DAILY_PROFILE_STATS_TABLE: ${var.gold_fact_daily_profile_statistics_table}
+              DIM_DATE_TABLE: ${var.gold_dimension_date_table}
+              DIM_TIMESTAMP_TABLE: ${var.gold_dimension_timestamp_table}
+            notebook_path: ../src/linkedin_analytics_jobs/3. gold modelling/gold materialized views create.ipynb
+            source: WORKSPACE
+          run_if: ALL_FAILED
+        - task_key: dashboard_refresh
+          depends_on:
+            - task_key: gold_refresh
+            - task_key: gold_create
+          run_if: AT_LEAST_ONE_SUCCESS
+          dashboard_task:
+            subscription:
+              subscribers:
+                - user_name: ${var.dashboard_subscriber}
+            warehouse_id: ${var.warehouse_id}
+            dashboard_id: ${resources.dashboards.linkedin_statistics.id}
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
+    linkedin_daily_ingest:
+      name: linkedin daily ingest
+      trigger:
+        pause_status: UNPAUSED
+        file_arrival:
+          url: /Volumes/${var.landing_catalog}/${resources.schemas.landing.name}/${resources.volumes.content_daily.name}/${var.ingestion_folder}/
+      tasks:
+        - task_key: bronze_daily_ingest
+          notebook_task:
+            base_parameters:
+              LINKEDIN_PROFILE_NAME: ${var.linkedin_profile_name}
+
+              LANDING_CATALOG: ${var.landing_catalog}
+              LANDING_SCHEMA: ${resources.schemas.landing.name}
+              LANDING_DAILY_VOLUME: ${resources.volumes.content_daily.name}
+
+              PENDING_FOLDER: ${var.ingestion_folder}
+              PROCESSED_FOLDER: ${var.processed_folder}
+              ERRORS_FOLDER: ${var.errors_folder} 
+
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_DISCOVERY_TABLE: ${var.bronze_profile_discovery_metrics_table}
+              BRONZE_TOTALS_TABLE: = ${var.bronze_profile_metrics_table}
+              BRONZE_FOLLOWERS_TABLE: ${var.bronze_profile_followers_table}
+
+              BRONZE_IMPRESSIONS_TABLE: ${var.bronze_staging_impressions_prefix}
+              BRONZE_ENGAGEMENTS_TABLE: ${var.bronze_staging_engagements_prefix}
+            notebook_path: ../src/linkedin_analytics_jobs/1. bronze ingestion/bronze daily ingest.ipynb
+            source: WORKSPACE
+        - task_key: bronze_post_ingest
+          depends_on:
+            - task_key: bronze_daily_ingest
+          notebook_task:
+            base_parameters:
+              LINKEDIN_PROFILE_NAME: ${var.linkedin_profile_name}
+
+              LANDING_CATALOG: ${var.landing_catalog}
+              LANDING_SCHEMA: ${resources.schemas.landing.name}
+              LANDING_POSTS_VOLUME: ${resources.volumes.posts.name}
+              
+              PENDING_FOLDER: ${var.ingestion_folder}
+              PROCESSED_FOLDER: ${var.processed_folder}
+              ERRORS_FOLDER: ${var.errors_folder}
+
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_IMPRESSIONS_TABLE: ${var.bronze_staging_impressions_prefix}
+              BRONZE_POSTS_TABLE: ${var.bronze_post_metadata_table}
+              BRONZE_POST_DETAILS_TABLE: ${var.bronze_post_metrics_table}
+            notebook_path: ../src/linkedin_analytics_jobs/1. bronze ingestion/bronze post ingest.ipynb
+            source: WORKSPACE
+        - task_key: trigger_transformation
+          depends_on:
+            - task_key: bronze_post_ingest
+          run_job_task:
+            job_id: ${resources.jobs.linkedin_transformation.id}
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
+    linkedin_historical_ingestion:
+      name: linkedin historical ingestion
+      trigger:
+        pause_status: UNPAUSED
+        file_arrival:
+          url: /Volumes/${var.landing_catalog}/${resources.schemas.landing.name}/${resources.volumes.content_historical.name}/${var.ingestion_folder}/
+      tasks:
+        - task_key: bronze_historical_ingest
+          notebook_task:
+            base_parameters:
+              LINKEDIN_PROFILE_NAME: ${var.linkedin_profile_name}
+
+              LANDING_CATALOG: ${var.landing_catalog}
+              LANDING_SCHEMA: ${resources.schemas.landing.name}
+              LANDING_DAILY_VOLUME: ${resources.volumes.content_historical.name}
+
+              PENDING_FOLDER: ${var.ingestion_folder}
+              PROCESSED_FOLDER: ${var.processed_folder}
+              ERRORS_FOLDER: ${var.errors_folder} 
+
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_TOTALS_TABLE: = ${var.bronze_profile_metrics_table}
+              BRONZE_FOLLOWERS_TABLE: ${var.bronze_profile_followers_table}
+            notebook_path: ../src/linkedin_analytics_jobs/1. bronze ingestion/bronze historical ingest.ipynb
+            source: WORKSPACE
+        - task_key: trigger_transformation
+          depends_on:
+            - task_key: bronze_historical_ingest
+          run_job_task:
+            job_id: ${resources.jobs.linkedin_transformation.id}
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
+    linkedin_post_ingest:
+      name: linkedin post ingest
+      trigger:
+        pause_status: UNPAUSED
+        file_arrival:
+          url: /Volumes/${var.landing_catalog}/${resources.schemas.landing.name}/${resources.volumes.posts.name}/${var.ingestion_folder}/
+      tasks:
+        - task_key: bronze_post_ingest
+          notebook_task:
+            base_parameters:
+              LINKEDIN_PROFILE_NAME: ${var.linkedin_profile_name}
+
+              LANDING_CATALOG: ${var.landing_catalog}
+              LANDING_SCHEMA: ${resources.schemas.landing.name}
+              LANDING_POSTS_VOLUME: ${resources.volumes.posts.name}
+              
+              PENDING_FOLDER: ${var.ingestion_folder}
+              PROCESSED_FOLDER: ${var.processed_folder}
+              ERRORS_FOLDER: ${var.errors_folder}
+
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_IMPRESSIONS_TABLE: ${var.bronze_staging_impressions_prefix}
+              BRONZE_POSTS_TABLE: ${var.bronze_post_metadata_table}
+              BRONZE_POST_DETAILS_TABLE: ${var.bronze_post_metrics_table}
+            notebook_path: ../src/linkedin_analytics_jobs/1. bronze ingestion/bronze post ingest.ipynb
+            source: WORKSPACE
+        - task_key: trigger_transformation
+          depends_on:
+            - task_key: bronze_post_ingest
+          run_job_task:
+            job_id: ${resources.jobs.linkedin_transformation.id}
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
+    linkedin_post_patch_ingest:
+      name: linkedin post patch ingest
+      trigger:
+        pause_status: UNPAUSED
+        file_arrival:
+          url: /Volumes/${var.landing_catalog}/${resources.schemas.landing.name}/${resources.volumes.patch.name}/${var.ingestion_folder}/${var.patch_post_subfolder}/
+        # table_update:
+        #   table_names:
+        #     - ${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_post_patch_table}
+      tasks:
+        - task_key: bronze_post_patch_ingest
+          notebook_task:
+            base_parameters:
+              LANDING_CATALOG: ${var.landing_catalog}
+              LANDING_SCHEMA: ${resources.schemas.landing.name}
+              LANDING_PATCH_VOLUME: ${resources.volumes.patch.name}
+              
+              PENDING_FOLDER: ${var.ingestion_folder}
+              PROCESSED_FOLDER: ${var.processed_folder}
+              ERRORS_FOLDER: ${var.errors_folder}
+              PATCH_POST_SUBFOLDER: ${var.patch_post_subfolder}
+
+              BRONZE_CATALOG: ${var.bronze_catalog}
+              BRONZE_SCHEMA: ${resources.schemas.bronze.name}
+              BRONZE_POST_PATCH_TABLE: ${var.bronze_post_patch_table}
+            notebook_path: ../src/linkedin_analytics_jobs/1. bronze ingestion/bronze post patch ingest.ipynb
+            source: WORKSPACE
+        - task_key: trigger_transformation
+          depends_on:
+            - task_key: bronze_post_patch_ingest
+          run_job_task:
+            job_id: ${resources.jobs.linkedin_transformation.id}
+      queue:
+        enabled: true
+      performance_target: PERFORMANCE_OPTIMIZED
+

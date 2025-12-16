@@ -1,0 +1,33 @@
+# This is a Databricks asset bundle definition for databricks_linkedin_analytics.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: databricks_linkedin_analytics
+  uuid: b4cb3073-4df7-474e-be6e-5b1143586d92
+
+include:
+  - resources/*.yml
+  - resources/*/*.yml
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://dbc-f9790a9f-76d6.cloud.databricks.com
+  prod:
+    mode: production
+    workspace:
+      host: https://dbc-f9790a9f-76d6.cloud.databricks.com
+      # We explicitly deploy to /Workspace/Users/<current user> to make sure we only have a single copy in the workspace.
+      root_path: /Workspace/Users/${workspace.current_user.email}/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      service_principal_name: ${var.pipeline_runner}
+    variables:
+      dashboard_subscriber: ${workspace.current_user.userName}
+    # permissions:
+    #   - user_name: <replace with your own user name>
+    #     level: CAN_MANAGE

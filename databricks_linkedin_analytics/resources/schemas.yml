@@ -1,0 +1,35 @@
+resources:
+  schemas:
+    landing:
+      catalog_name: ${var.landing_catalog}
+      comment: LinkedIn landing schema created by DAB
+      name: ${var.common_schema}
+    bronze:
+      catalog_name: ${var.bronze_catalog}
+      comment: LinkedIn bronze schema created by DAB
+      name: ${var.common_schema}
+    silver:
+      catalog_name: ${var.silver_catalog}
+      comment: LinkedIn silver schema created by DAB
+      name: ${var.common_schema}
+    gold:
+      catalog_name: ${var.gold_catalog}
+      comment: LinkedIn gold schema created by DAB
+      name: ${var.common_schema}
+  volumes:
+    content_daily:
+      catalog_name: ${var.landing_catalog}
+      schema_name: ${resources.schemas.landing.name}
+      name: ${var.landing_content_daily_volume}
+    content_historical:
+      catalog_name: ${var.landing_catalog}
+      schema_name: ${resources.schemas.landing.name}
+      name: ${var.landing_content_historical_volume}
+    posts:
+      catalog_name: ${var.landing_catalog}
+      schema_name: ${resources.schemas.landing.name}
+      name: ${var.landing_posts_volume}
+    patch:
+      catalog_name: ${var.landing_catalog}
+      schema_name: ${resources.schemas.landing.name}
+      name: ${var.landing_patch_volume}

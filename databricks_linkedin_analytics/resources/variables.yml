@@ -1,0 +1,116 @@
+variables:
+
+  linkedin_profile_name:
+    description: The name of the LinkedIn profile
+    default: r'[a-zA-Z0-9]+'
+  warehouse_id:
+    description: The ID of the Databricks SQL warehouse cluster
+  pipeline_runner:
+    description: The name of the service principal used to deploy the DAB and run the pipelines
+
+  # 1. Settings for the medallion layer catalogs and schemas
+  landing_catalog: 
+    description: The ID of the landing catalog
+    default: landing
+  bronze_catalog: 
+    description: The ID of the bronze catalog
+    default: bronze
+  silver_catalog: 
+    description: The ID of the bronze catalog
+    default: silver
+  gold_catalog: 
+    description: The ID of the bronze catalog
+    default: gold
+  common_schema:
+    description: The ID of the schema used in all medallion catalogs
+    default: linkedin
+
+  # 2. Settings for the landing volumes
+  landing_content_daily_volume:
+    description: The ID of the landing volume for daily content metrics Excel files
+    default: content_daily
+  landing_content_historical_volume:
+    description: The ID of the landing volume for historical content metrics Excel files
+    default: historical_daily
+  landing_posts_volume:
+    description: The ID of the landing volume for post metrics Excel files
+    default: posts
+  landing_patch_volume:
+    description: The ID of the landing volume for patch CSV files
+    default: patch
+  ingestion_folder:
+    description: The folder in each volume for uploading files to be ingested
+    default: pending
+  processed_folder:
+    description: The folder in each volume for storing successfully ingested files
+    default: processed
+  errors_folder:
+    description: The folder in each volume for storing files with errors during ingestion
+    default: errors
+  patch_post_subfolder:
+    description: The subfolder in the landing patch volume for patching posts data
+    default: posts
+
+  # 3. Settings for the bronze tables
+  bronze_profile_discovery_metrics_table:
+    description: The ID of the bronze table for profile daily discovery metrics
+    default: discovery
+  bronze_profile_followers_table:
+    description: The ID of the bronze table for profile daily follower metrics
+    default: followers
+  bronze_post_patch_table:
+    description: The ID of the bronze table for post patching
+    default: linkedin_patch
+  bronze_post_metrics_table:
+    description: The ID of the bronze table for post metrics (taken from post metrics Excel files)
+    default: post_details
+  bronze_post_metadata_table:
+    description: The ID of the bronze table for post metadata
+    default: posts
+  bronze_profile_metrics_table:
+    description: The ID of the bronze table for profile daily engagement and impressions metrics
+    default: totals
+
+  # 3.1 Settings for the bronze staging tables
+  bronze_staging_impressions_prefix:
+    description: The prefix for bronze staging tables for daily post impressions
+    default: impressions
+  bronze_staging_engagements_prefix:
+    description: The prefix for bronze staging tables for daily post engagements
+    default: engagements
+
+  # 4. Settings for the silver tables
+  silver_post_impressions:
+    description: The ID of the silver table for post impressions
+    default: impressions
+  silver_post_engagements:
+    description: The ID of the silver table for post engagements
+    default: engagements
+  silver_profile_followers:
+    description: The ID of the silver table for profile follower metrics
+    default: followers
+  silver_post_metadata:
+    description: The ID of the silver table for consolidated post metadata
+    default: posts
+  silver_profile_metrics:
+    description: The ID of the silver table for profile engagement and impressions metrics
+    default: totals
+
+  # 4. Settings for the gold tables
+  gold_fact_daily_post_statistics_table:
+    description: The ID of the gold fact table/view for daily posts statistics
+    default: fct_daily_post_statistics
+  gold_fact_daily_profile_statistics_table:
+    description: The ID of the gold fact table/view for daily profile statistics
+    default: fct_daily_profile_statistics
+  gold_dimension_date_table:
+    description: The ID of the gold dimension table/view for dates
+    default: dim_date
+  gold_dimension_timestamp_table:
+    description: The ID of the gold dimension table/view for timestamps
+    default: dim_timestamp
+
+  # 5. Settings for the dashboard
+  dashboard_subscriber:
+    description: The email of the subscriber to the dashboard
+    default: ${workspace.current_user.userName}

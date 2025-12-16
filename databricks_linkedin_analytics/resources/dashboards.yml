@@ -1,0 +1,10 @@
+sync:
+  exclude:
+    - ../src/*.lvdash.json
+    - ../src/*/*.lvdash.json
+resources:
+  dashboards:
+    linkedin_statistics:
+      display_name: LinkedIn Statistics
+      file_path: ../src/linkedin_analytics_jobs/4. data product/LinkedIn Statistics.lvdash.json
+      warehouse_id: ${var.warehouse_id}
