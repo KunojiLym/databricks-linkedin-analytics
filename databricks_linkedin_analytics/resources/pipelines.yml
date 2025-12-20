@@ -1,0 +1,29 @@
+resources:
+  pipelines:
+    gold_create:
+      name: gold_create
+      configuration:
+        SILVER_CATALOG: ${var.silver_catalog}
+        SILVER_SCHEMA: ${resources.schemas.silver.name}
+        SILVER_IMPRESSIONS_TABLE: ${var.silver_post_impressions}
+        SILVER_ENGAGEMENTS_TABLE: ${var.silver_post_engagements}
+        SILVER_POSTS_TABLE: ${var.silver_post_metadata}
+        SILVER_TOTALS_TABLE: ${var.silver_profile_metrics}
+        SILVER_FOLLOWERS_TABLE: ${var.silver_profile_followers}
+        GOLD_CATALOG: ${var.gold_catalog}
+        GOLD_SCHEMA: ${resources.schemas.gold.name}
+        FCT_DAILY_PROFILE_STATS_TABLE: ${var.gold_fact_daily_profile_statistics_table}
+        FCT_DAILY_POST_STATS_TABLE: ${var.gold_fact_daily_post_statistics_table}
+        DIM_DATE_TABLE: ${var.gold_dimension_date_table}
+        DIM_TIMESTAMP_TABLE: ${var.gold_dimension_timestamp_table}
+      libraries:
+        - glob:
+            include: ../src/linkedin_analytics_jobs/3. gold modelling/pipeline_gold_create/**
+      schema: ${resources.schemas.gold.name}
+      continuous: false
+      development: false
+      photon: true
+      channel: CURRENT
+      catalog: ${var.gold_catalog}
+      serverless: true
+      root_path: ../src/linkedin_analytics_jobs/3. gold modelling/

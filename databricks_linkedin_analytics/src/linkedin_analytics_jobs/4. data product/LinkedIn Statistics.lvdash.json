@@ -4,21 +4,162 @@
       "name": "bea9d2f0",
       "displayName": "dim_date",
       "queryLines": [
-        "SELECT * FROM gold.linkedin.dim_date"
+        "SELECT * FROM IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :DIM_DATE_TABLE)"
+      ],
+      "parameters": [
+        {
+          "displayName": "GOLD_CATALOG",
+          "keyword": "GOLD_CATALOG",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "gold"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "GOLD_SCHEMA",
+          "keyword": "GOLD_SCHEMA",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "linkedin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "DIM_DATE_TABLE",
+          "keyword": "DIM_DATE_TABLE",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "dim_date"
+                }
+              ]
+            }
+          }
+        }
       ]
     },
     {
       "name": "d4e3c8c9",
       "displayName": "dim_timestamp",
       "queryLines": [
-        "SELECT * FROM gold.linkedin.dim_timestamp"
+        "SELECT * FROM IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :DIM_TIMESTAMP_TABLE)"
+      ],
+      "parameters": [
+        {
+          "displayName": "GOLD_CATALOG",
+          "keyword": "GOLD_CATALOG",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "gold"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "GOLD_SCHEMA",
+          "keyword": "GOLD_SCHEMA",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "linkedin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "DIM_TIMESTAMP_TABLE",
+          "keyword": "DIM_TIMESTAMP_TABLE",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "dim_timestamp"
+                }
+              ]
+            }
+          }
+        }
       ]
     },
     {
       "name": "c2b17097",
       "displayName": "fct_daily_post_statistics",
       "queryLines": [
-        "SELECT * FROM gold.linkedin.fct_daily_post_statistics"
+        "SELECT * FROM IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :FCT_DAILY_POST_STATS_TABLE)"
+      ],
+      "parameters": [
+        {
+          "displayName": "GOLD_CATALOG",
+          "keyword": "GOLD_CATALOG",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "gold"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "GOLD_SCHEMA",
+          "keyword": "GOLD_SCHEMA",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "linkedin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "FCT_DAILY_POST_STATS_TABLE",
+          "keyword": "FCT_DAILY_POST_STATS_TABLE",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "fct_daily_post_statistics"
+                }
+              ]
+            }
+          }
+        }
       ]
     },
     {
@@ -32,7 +173,54 @@
         "    engagements,\r\n",
         "    change_in_impressions,\r\n",
         "    change_in_engagements\r\n",
-        "FROM gold.linkedin.fct_daily_profile_statistics"
+        "FROM IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :FCT_DAILY_POFILE_STATS_TABLE)"
+      ],
+      "parameters": [
+        {
+          "displayName": "GOLD_CATALOG",
+          "keyword": "GOLD_CATALOG",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "gold"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "GOLD_SCHEMA",
+          "keyword": "GOLD_SCHEMA",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "linkedin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "FCT_DAILY_POFILE_STATS_TABLE",
+          "keyword": "FCT_DAILY_POFILE_STATS_TABLE",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "fct_daily_profile_statistics"
+                }
+              ]
+            }
+          }
+        }
       ]
     },
     {
@@ -44,7 +232,7 @@
         "        AVG(impressions) AS avg_impressions_by_weekday, \r\n",
         "        AVG(engagements) AS avg_engagements_by_weekday, \r\n",
         "        weekday\r\n",
-        "    FROM gold.linkedin.fct_daily_post_statistics daily_stats\r\n",
+        "    FROM IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :FCT_DAILY_POST_STATS_TABLE) daily_stats\r\n",
         "    LEFT JOIN gold.linkedin.dim_date dim_date\r\n",
         "    ON daily_stats.analytics_date = dim_date.date\r\n",
         "    WHERE post_id = 'total'\r\n",
@@ -72,11 +260,73 @@
         "    COALESCE(change_in_engagements, 0) AS change_in_engagements, \r\n",
         "    title, \r\n",
         "    content\r\n",
-        "FROM gold.linkedin.fct_daily_post_statistics daily_stats\r\n",
-        "LEFT JOIN gold.linkedin.dim_date dim_date\r\n",
+        "FROM IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :FCT_DAILY_POST_STATS_TABLE) daily_stats\r\n",
+        "LEFT JOIN IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :DIM_DATE_TABLE) dim_date\r\n",
         "ON daily_stats.analytics_date = dim_date.date\r\n",
         "LEFT JOIN avg_stats_by_weekday\r\n",
         "ON dim_date.weekday = avg_stats_by_weekday.weekday"
+      ],
+      "parameters": [
+        {
+          "displayName": "GOLD_CATALOG",
+          "keyword": "GOLD_CATALOG",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "gold"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "GOLD_SCHEMA",
+          "keyword": "GOLD_SCHEMA",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "linkedin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "FCT_DAILY_POST_STATS_TABLE",
+          "keyword": "FCT_DAILY_POST_STATS_TABLE",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "fct_daily_post_statistics"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "displayName": "DIM_DATE_TABLE",
+          "keyword": "DIM_DATE_TABLE",
+          "dataType": "STRING",
+          "defaultSelection": {
+            "values": {
+              "dataType": "STRING",
+              "values": [
+                {
+                  "value": "dim_date"
+                }
+              ]
+            }
+          }
+        }
       ]
     }
   ],

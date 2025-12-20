@@ -2,7 +2,6 @@ variables:
 
   linkedin_profile_name:
     description: The name of the LinkedIn profile
-    default: r'[a-zA-Z0-9]+'
   warehouse_id:
     description: The ID of the Databricks SQL warehouse cluster
   pipeline_runner:
@@ -16,10 +15,10 @@ variables:
     description: The ID of the bronze catalog
     default: bronze
   silver_catalog: 
-    description: The ID of the bronze catalog
+    description: The ID of the silver catalog
     default: silver
   gold_catalog: 
-    description: The ID of the bronze catalog
+    description: The ID of the gold catalog
     default: gold
   common_schema:
     description: The ID of the schema used in all medallion catalogs
@@ -47,7 +46,7 @@ variables:
   errors_folder:
     description: The folder in each volume for storing files with errors during ingestion
     default: errors
-  patch_post_subfolder:
+  post_patch_subfolder:
     description: The subfolder in the landing patch volume for patching posts data
     default: posts
 

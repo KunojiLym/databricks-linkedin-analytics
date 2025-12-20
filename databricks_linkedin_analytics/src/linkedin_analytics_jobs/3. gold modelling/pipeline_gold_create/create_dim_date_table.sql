@@ -1,0 +1,18 @@
+CREATE MATERIALIZED VIEW IF NOT EXISTS ${GOLD_CATALOG}.${GOLD_SCHEMA}.${DIM_DATE_TABLE} AS
+SELECT
+  date,
+  DAY(date) AS day,
+  MONTH(date) AS month,
+  YEAR(date) AS year,
+  WEEKOFYEAR(date) AS week,
+  WEEKDAY(date) AS weekday,
+  DATE_FORMAT(date, 'E') AS weekday_str,
+  WEEKDAY(date) >= 5 AS is_weekend
+FROM (
+  SELECT date 
+  FROM ${SILVER_CATALOG}.${SILVER_SCHEMA}.${SILVER_TOTALS_TABLE}
+  UNION 
+  SELECT post_publish_date AS date 
+  FROM ${SILVER_CATALOG}.${SILVER_SCHEMA}.${SILVER_POSTS_TABLE}
+)
+ORDER BY date ASC

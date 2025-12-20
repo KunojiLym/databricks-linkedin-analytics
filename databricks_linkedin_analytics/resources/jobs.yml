@@ -48,8 +48,8 @@ resources:
             base_parameters:
               BRONZE_CATALOG: ${var.bronze_catalog}
               BRONZE_SCHEMA: ${resources.schemas.bronze.name}
-              BRONZE_POSTS_TABLE: ${var.bronze_post_metrics_table}
-              BRONZE_POST_DETAILS_TABLE:  ${var.bronze_post_metadata_table}
+              BRONZE_POSTS_TABLE: ${var.bronze_post_metadata_table}
+              BRONZE_POST_DETAILS_TABLE:  ${var.bronze_post_metrics_table}
               BRONZE_POST_PATCH_TABLE: ${var.bronze_post_patch_table}
 
               SILVER_CATALOG: ${var.silver_catalog}
@@ -57,52 +57,20 @@ resources:
               SILVER_POSTS_TABLE: ${var.silver_post_metadata}
             notebook_path: ../src/linkedin_analytics_jobs/2. silver transformation/silver post enrichment.ipynb
             source: WORKSPACE
-        - task_key: gold_refresh
+        - task_key: gold_create_or_refresh
           depends_on:
             - task_key: silver_engagements_transformation
             - task_key: silver_impressions_transformation
             - task_key: silver_posts_enrichment
             - task_key: silver_views_update
-          notebook_task:
-            base_parameters:
-              GOLD_CATALOG: ${var.gold_catalog}
-              GOLD_SCHEMA:  ${resources.schemas.gold.name}
-              FCT_DAILY_POSTS_STATS_TABLE: ${var.gold_fact_daily_post_statistics_table}
-              FCT_DAILY_PROFILE_STATS_TABLE: ${var.gold_fact_daily_profile_statistics_table}
-              DIM_DATE_TABLE: ${var.gold_dimension_date_table}
-              DIM_TIMESTAMP_TABLE: ${var.gold_dimension_timestamp_table}
-            notebook_path: ../src/linkedin_analytics_jobs/3. gold modelling/gold materialized views refresh.ipynb
-            source: WORKSPACE
-          max_retries: 2
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.gold_create.id}
+          max_retries: 3
           min_retry_interval_millis: 60000
           retry_on_timeout: true
-        - task_key: gold_create
-          depends_on:
-            - task_key: gold_refresh
-          notebook_task:
-            base_parameters:
-              SILVER_CATALOG: ${var.silver_catalog}
-              SILVER_SCHEMA: ${resources.schemas.silver.name}
-              SILVER_IMPRESSIONS_TABLE: ${var.silver_post_impressions}
-              SILVER_ENGAGEMENTS_TABLE: ${var.silver_post_engagements}
-              SILVER_POSTS_TABLE: ${var.silver_post_metadata}
-              SILVER_FOLLOWERS_TABLE: ${var.silver_profile_followers}
-              SILVER_TOTALS_TABLE: ${var.silver_profile_metrics}
-
-              GOLD_CATALOG: ${var.gold_catalog}
-              GOLD_SCHEMA:  ${resources.schemas.gold.name}
-              FCT_DAILY_POSTS_STATS_TABLE: ${var.gold_fact_daily_post_statistics_table}
-              FCT_DAILY_PROFILE_STATS_TABLE: ${var.gold_fact_daily_profile_statistics_table}
-              DIM_DATE_TABLE: ${var.gold_dimension_date_table}
-              DIM_TIMESTAMP_TABLE: ${var.gold_dimension_timestamp_table}
-            notebook_path: ../src/linkedin_analytics_jobs/3. gold modelling/gold materialized views create.ipynb
-            source: WORKSPACE
-          run_if: ALL_FAILED
         - task_key: dashboard_refresh
           depends_on:
-            - task_key: gold_refresh
-            - task_key: gold_create
-          run_if: AT_LEAST_ONE_SUCCESS
+            - task_key: gold_create_or_refresh
           dashboard_task:
             subscription:
               subscribers:
@@ -135,7 +103,7 @@ resources:
               BRONZE_CATALOG: ${var.bronze_catalog}
               BRONZE_SCHEMA: ${resources.schemas.bronze.name}
               BRONZE_DISCOVERY_TABLE: ${var.bronze_profile_discovery_metrics_table}
-              BRONZE_TOTALS_TABLE: = ${var.bronze_profile_metrics_table}
+              BRONZE_TOTALS_TABLE: ${var.bronze_profile_metrics_table}
               BRONZE_FOLLOWERS_TABLE: ${var.bronze_profile_followers_table}
 
               BRONZE_IMPRESSIONS_TABLE: ${var.bronze_staging_impressions_prefix}
@@ -162,6 +130,7 @@ resources:
               BRONZE_IMPRESSIONS_TABLE: ${var.bronze_staging_impressions_prefix}
               BRONZE_POSTS_TABLE: ${var.bronze_post_metadata_table}
               BRONZE_POST_DETAILS_TABLE: ${var.bronze_post_metrics_table}
+              BRONZE_POST_PATCH_TABLE: ${var.bronze_post_patch_table}
             notebook_path: ../src/linkedin_analytics_jobs/1. bronze ingestion/bronze post ingest.ipynb
             source: WORKSPACE
         - task_key: trigger_transformation
@@ -194,7 +163,7 @@ resources:
 
               BRONZE_CATALOG: ${var.bronze_catalog}
               BRONZE_SCHEMA: ${resources.schemas.bronze.name}
-              BRONZE_TOTALS_TABLE: = ${var.bronze_profile_metrics_table}
+              BRONZE_TOTALS_TABLE: ${var.bronze_profile_metrics_table}
               BRONZE_FOLLOWERS_TABLE: ${var.bronze_profile_followers_table}
             notebook_path: ../src/linkedin_analytics_jobs/1. bronze ingestion/bronze historical ingest.ipynb
             source: WORKSPACE
@@ -246,7 +215,7 @@ resources:
       trigger:
         pause_status: UNPAUSED
         file_arrival:
-          url: /Volumes/${var.landing_catalog}/${resources.schemas.landing.name}/${resources.volumes.patch.name}/${var.ingestion_folder}/${var.patch_post_subfolder}/
+          url: /Volumes/${var.landing_catalog}/${resources.schemas.landing.name}/${resources.volumes.patch.name}/${var.ingestion_folder}/${var.post_patch_subfolder}/
         # table_update:
         #   table_names:
         #     - ${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_post_patch_table}
@@ -261,7 +230,7 @@ resources:
               PENDING_FOLDER: ${var.ingestion_folder}
               PROCESSED_FOLDER: ${var.processed_folder}
               ERRORS_FOLDER: ${var.errors_folder}
-              PATCH_POST_SUBFOLDER: ${var.patch_post_subfolder}
+              POST_PATCH_SUBFOLDER: ${var.post_patch_subfolder}
 
               BRONZE_CATALOG: ${var.bronze_catalog}
               BRONZE_SCHEMA: ${resources.schemas.bronze.name}
