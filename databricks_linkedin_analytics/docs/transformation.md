@@ -1,6 +1,7 @@
 # Transformation (Silver layer)
 
-Maps to: Blog Part 5 — Cleaning and Transforming Data
+Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 5: Cleaning and Transforming Data](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-5-cleaning-and-transforming-data/)
 
 ## Purpose
 - Consolidate and standardize raw bronze tables into clean, analysis-ready silver tables: `impressions`, `engagements`, `posts`, `followers`, `totals`.

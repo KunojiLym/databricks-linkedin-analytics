@@ -1,6 +1,7 @@
 # Maintainability and code organization
 
-Maps to: Blog Part 9 — Making a Maintainable Pipeline
+Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 9: Making a Maintainable Pipeline](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-9-making-a-maintainable-pipeline/)
 
 ## Principles
 - Keep single responsibility per notebook: ingestion, transformation, modeling

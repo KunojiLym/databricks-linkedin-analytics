@@ -1,6 +1,7 @@
 # Modeling (Gold layer)
 
-Maps to: Blog Part 6 — Modelling the Data
+Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 6: Modelling the Data](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-6-modelling-the-data/)
 
 ## Overview
 - The gold layer contains dimensional and fact tables optimized for analytics and dashboards. The repository includes SQL DDL used by the gold pipeline.

@@ -1,6 +1,7 @@
 # Orchestration — Jobs and Pipelines
 
-Maps to: Blog Part 8 — Orchestrating and Automating the Pipeline
+Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 8: Orchestrating and Automating the Pipeline](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-8-orchestrating-and-automating-the-pipeline/)
 
 ## Overview
 - Orchestration is implemented using Databricks jobs and the Pipelines feature. The `databricks.yml` bundle wires resources in `resources/*.yml` into the workspace.

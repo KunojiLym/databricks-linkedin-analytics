@@ -1,6 +1,8 @@
 # Architecture — Reference overview
 
-Maps to: Blog Part 2 — Choosing the Data Source / Architecture overview
+Maps to the following posts in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 2: Choosing the Data Source](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-2-choosing-the-data-source/) 
+- [Part 3: Creating the Data Architecture](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-3-creating-the-data-architecture/)
 
 ## Purpose
 This page describes the medallion architecture used in this project (Landing → Bronze → Silver → Gold), the orchestration components, and where artifacts live in the repository.

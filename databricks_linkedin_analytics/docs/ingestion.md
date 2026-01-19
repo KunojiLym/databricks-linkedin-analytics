@@ -1,6 +1,8 @@
 # Ingestion (Bronze layer)
 
-Maps to: Blog Parts 3–4 — Creating the Data Architecture & Ingesting Data
+Maps to the following posts in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 3: Creating the Data Architecture](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-3-creating-the-data-architecture/)
+- [Part 4: Ingesting Data](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-4-ingesting-data/) 
 
 ## Goals of the bronze layer
 - Capture raw data as-is with minimal transformation

@@ -1,6 +1,8 @@
 # Data sources and contracts
 
-Maps to: Blog Part 3 — Creating the Data Architecture / Data Sources
+Maps to the following posts in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 2: Choosing the Data Source](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-2-choosing-the-data-source/) 
+- [Part 3: Creating the Data Architecture](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-3-creating-the-data-architecture/)
 
 ## Overview
 This project ingests LinkedIn profile and content metrics exported as Excel/CSV files and optionally via LinkedIn APIs where available. The repository includes example notebooks and configuration for both daily and historical ingestion.

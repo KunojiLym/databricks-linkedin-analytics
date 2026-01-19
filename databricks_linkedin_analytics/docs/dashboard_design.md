@@ -1,6 +1,7 @@
 # Dashboard design and data product
 
-Maps to: Blog Part 7 — Dashboard Design for Insights and Impact
+Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 7: Dashboard Design for Insights and Impact](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-7-dashboard-design-for-insights-and-impact/) 
 
 ## Artifacts
 - `src/linkedin_analytics_jobs/4. data product/LinkedIn Statistics.lvdash.json` — dashboard definition exported from the visualization tool

@@ -1,6 +1,7 @@
 # Observability and Monitoring
 
-Maps to: Blog Part 10 — Observing the Pipeline
+Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
+- [Part 10: Observing the Pipeline](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-10-observing-the-pipeline/)
 
 ## What to monitor
 - Job run status and durations (success/failure rates)
