@@ -22,6 +22,7 @@ This is the consolidated documentation index. The goal is to be easy to navigate
 ## Quick pointers
 - **Code-first:** open notebooks and SQL files in `src/linkedin_analytics_jobs/` for concrete examples.
 - **Config:** `databricks_linkedin_analytics/resources/variables.yml` controls table and volume names.
+- **Dev overrides:** You can create `.databricks/bundle/dev/variable-overrides.json` for local per-target overrides — see `docs/quickstart.md` for an example and guidance about not committing secrets.
 - **Deployment:** `databricks_linkedin_analytics/databricks.yml` and `resources/*.yml` define the bundle, pipelines and jobs.
 - **Dashboards:** `src/linkedin_analytics_jobs/4. data product/LinkedIn Statistics.lvdash.json` and `resources/dashboards.yml`.
 

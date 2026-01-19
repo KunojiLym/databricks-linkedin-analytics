@@ -1,3 +1,16 @@
+# From DAB
+
+**/.databricks/bundle/*/variable-overrides.json
+**/build/
+**/dist/
+**/__pycache__/
+**/*.egg-info
+**/.venv/
+**/scratch/**
+!**/scratch/README.md
+**/**/explorations/**
+**/**/!explorations/README.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

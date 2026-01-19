@@ -45,8 +45,27 @@ Running notebooks locally (lightweight)
 Variables reference
 - The repository defines many deploy-time variables in `databricks_linkedin_analytics/resources/variables.yml` (catalog names, schema names, volume names, table names). Use those defaults for a development deployment and override them in production.
 
+Dev variable overrides (optional)
+- During development you can provide per-target overrides for bundle variables by creating a JSON file at `.databricks/bundle/<target>/variable-overrides.json` (for example `.databricks/bundle/dev/variable-overrides.json`). This file is used by local bundle tooling to inject specific variable values when deploying to the matching target.
+
+Example (your local dev override)
+- Example file path: `.databricks/bundle/dev/variable-overrides.json`
+- Example content (replace sensitive values with placeholders):
+
+```json
+{
+  "linkedin_profile_name": "YourProfileNameHere",
+  "warehouse_id": "your_warehouse_id_here",
+  "pipeline_runner": "your_pipeline_runner_name_here"
+}
+```
+
+Guidance
+- Do not commit secrets or tokens into this file. If you need to store secrets for CI or shared environments, use secret stores (Databricks secrets, environment variables, or CI secrets).
+- If you keep a local `variable-overrides.json` for convenience, add `.databricks/bundle/*/variable-overrides.json` to your global or repo `.gitignore` to avoid accidental commits.
+- For production deployments, prefer passing variables via secure CI/CD pipelines or Databricks workspace variables instead of committing overrides in the repo.
+
 Troubleshooting
-- If deployment fails, check `databricks bundle` output for missing variables or permissions. Ensure the Databricks host and token are valid.
-- For job failures, review the job run logs in the Databricks Jobs UI.
+- If your deploy fails due to missing variables, check this overrides file as well as `resources/variables.yml` for required keys.
 
 For more details and examples, see `docs/orchestration.md` and `docs/ingestion.md`.
