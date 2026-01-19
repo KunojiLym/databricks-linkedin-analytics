@@ -1,4 +1,4 @@
-# Contributing to databricks_linkedin_analytics
+# Contributing to Personal LinkedIn Analytics on Databricks
 
 Thanks for contributing! This file explains how to file issues, propose changes, and run basic checks.
 
@@ -21,6 +21,7 @@ PR checklist (required before merging)
   - [ ] Doc pages are short, high-level, and link to authoritative code (see `docs/documentation_hygiene.md`)
   - [ ] If a doc change affects behavior or configuration, `CHANGELOG.md` has an `Unreleased` entry
   - [ ] Large code blocks were not copy-pasted into docs (if included, ensure they are <= 5 lines)
+  - [ ] Local dev overrides (e.g., `.databricks/bundle/*/variable-overrides.json`) do not contain secrets; use Databricks secrets or CI secrets for tokens. See `docs/quickstart.md` for examples.
 
 Testing guidance
 - Unit tests: run `pytest` (if tests are added)

@@ -31,3 +31,6 @@
 - Keep the `docs/` index (`docs/README.md`) up-to-date with links to files and the `docs/TODO.md`.
 - When renaming files, update any doc links and add a changelog entry.
 
+## Secrets and local overrides
+- If you maintain a local `.databricks/bundle/<target>/variable-overrides.json`, ensure it does not contain secrets or long-lived tokens. Prefer using Databricks Secrets or CI secrets for sensitive values.
+- Add `.databricks/bundle/*/variable-overrides.json` to your personal or repository `.gitignore` if you keep local overrides for development convenience.
