@@ -1,0 +1,12 @@
+# Mapping: blog parts → docs → repo files
+
+part2: { doc: docs/architecture.md, blog: "Part 2", files: ["databricks.yml", "resources/schemas.yml"] }
+part3: { doc: docs/data_sources.md, blog: "Part 3", files: ["src/.../0. poc and utility/linkedin_pipeline_poc.ipynb", "resources/variables.yml"] }
+part4: { doc: docs/ingestion.md, blog: "Part 4", files: ["src/linkedin_analytics_jobs/1. bronze ingestion/*"] }
+part5: { doc: docs/transformation.md, blog: "Part 5", files: ["src/linkedin_analytics_jobs/2. silver transformation/*"] }
+part6: { doc: docs/modeling.md, blog: "Part 6", files: ["src/linkedin_analytics_jobs/3. gold modelling/pipeline_gold_create/*.sql"] }
+part7: { doc: docs/dashboard_design.md, blog: "Part 7", files: ["src/.../4. data product/LinkedIn Statistics.lvdash.json", "resources/dashboards.yml"] }
+part8: { doc: docs/orchestration.md, blog: "Part 8", files: ["resources/pipelines.yml", "resources/jobs.yml"] }
+part9: { doc: docs/maintainability.md, blog: "Part 9", files: ["resources/variables.yml", "resources/schemas.yml"] }
+part10: { doc: docs/observability.md, blog: "Part 10", files: ["resources/jobs.yml"] }
+part11: { doc: docs/TODO.md, blog: "Part 11", files: ["docs/*"] }
