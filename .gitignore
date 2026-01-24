@@ -9,7 +9,7 @@
 **/scratch/**
 !**/scratch/README.md
 **/**/explorations/**
-**/**/!explorations/README.md
+!**/**/explorations/README.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
