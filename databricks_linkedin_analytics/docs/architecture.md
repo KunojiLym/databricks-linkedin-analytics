@@ -1,16 +1,16 @@
-# Architecture — Reference overview
+# Architecture - Reference overview
 
 Maps to the following posts in [Build Your Own LinkedIn Analytics](https://www.yzouyang.com/category/blog-series/build-your-own-linkedin-analytics/): 
 - [Part 2: Choosing the Data Source](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-2-choosing-the-data-source/) 
 - [Part 3: Creating the Data Architecture](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-3-creating-the-data-architecture/)
 
 ## Purpose
-This page describes the medallion architecture used in this project (Landing → Bronze → Silver → Gold), the orchestration components, and where artifacts live in the repository.
+This page describes the medallion architecture used in this project (Landing -> Bronze -> Silver -> Gold), the orchestration components, and where artifacts live in the repository.
 
 ## Repo references
-- `databricks_linkedin_analytics/databricks.yml` — bundle targets and deployment settings
-- `databricks_linkedin_analytics/resources/*.yml` — pipelines, jobs, dashboards, variables
-- `databricks_linkedin_analytics/src/` — ingestion, transformation notebooks and SQL for modeling
+- `databricks_linkedin_analytics/databricks.yml` - bundle targets and deployment settings
+- `databricks_linkedin_analytics/resources/*.yml` - pipelines, jobs, dashboards, variables
+- `databricks_linkedin_analytics/src/` - ingestion, transformation notebooks and SQL for modeling
 
 ## Components
 - Databricks Workspace: notebooks and jobs are deployed via the bundle
@@ -31,5 +31,18 @@ This page describes the medallion architecture used in this project (Landing →
 
 ## Deployment model
 - The repository is deployed as a Databricks asset bundle. Use `databricks bundle deploy --target dev` to create a development copy. See `docs/quickstart.md` for exact commands.
+
+## Configuration
+- Bundle targets and workspace wiring live in `databricks_linkedin_analytics/databricks.yml`.
+- Orchestration, pipelines, dashboards, and monitoring are defined in `databricks_linkedin_analytics/resources/*.yml`.
+
+## Variables
+- Core environment settings (catalogs, schemas, volumes, table names, monitoring) are defined in `databricks_linkedin_analytics/resources/variables.yml`.
+- Per-target overrides can be supplied via `.databricks/bundle/<target>/variable-overrides.json` (see `docs/quickstart.md`).
+
+## Reference
+- Orchestration: `databricks_linkedin_analytics/resources/jobs.yml`, `databricks_linkedin_analytics/resources/pipelines.yml`
+- Monitoring: `databricks_linkedin_analytics/resources/monitoring.yml`
+- Dashboards: `databricks_linkedin_analytics/resources/dashboards.yml`
 
 This page should be used as the high-level starting point for new contributors and operators.

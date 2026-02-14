@@ -15,6 +15,14 @@ Affected artifacts
 - Files: list notebooks, SQL files, and YAML resource files changed (paths)
 - Tables: list impacted catalog.schema.table names and partitions
 
+Configuration changes
+- Resources: list any `resources/*.yml` or `databricks.yml` updates that affect deployment
+- Jobs/pipelines: list job or pipeline IDs that change behavior
+
+Variables affected
+- List variable keys from `resources/variables.yml` that were added, removed, or modified
+- Note any default value changes or new required variables
+
 Impact
 - Describe who and what will be impacted (dashboards, downstream queries, CI)
 
@@ -31,10 +39,13 @@ Rollback plan
 - Steps to revert in case of failure (restore snapshot, re-run previous pipeline)
 
 Change log entry
-- Provide the one-line `CHANGELOG.md` entry to add under `Unreleased`.
+- Provide the one-line `CHANGELOG.md` entry to add under the latest dated section.
 
 Tests
 - Describe tests to validate the migration (unit tests, notebook smoke runs, SQL validations)
+
+Reference
+- Link to relevant docs, notebooks, SQL files, and resource configs
 
 Owner
 - Name and contact for the team/entity responsible for the migration

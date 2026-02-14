@@ -25,3 +25,16 @@ Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yz
 
 ## Consumption
 - Dashboards and SQL queries should reference the gold catalog/schema configured in `resources/variables.yml`.
+
+## Configuration
+- Gold pipeline config is defined in `resources/pipelines.yml`.
+- Table naming and schemas are governed by `resources/variables.yml` and `resources/schemas.yml`.
+
+## Variables
+- `gold_catalog`, `common_schema`: target catalog and schema for gold tables.
+- `gold_fact_daily_post_statistics_table`, `gold_fact_daily_profile_statistics_table`: fact table names.
+- `gold_dimension_date_table`, `gold_dimension_timestamp_table`: dimension table names.
+
+## Reference
+- Gold SQL: `src/linkedin_analytics_jobs/3. gold modelling/pipeline_gold_create/`
+- Orchestration: `docs/orchestration.md`

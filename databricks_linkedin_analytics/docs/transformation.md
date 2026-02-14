@@ -24,5 +24,13 @@ Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yz
 - Break large notebooks into smaller, testable functions or modules
 - Surface DQ metrics into a monitoring table or logs
 
+## Configuration
+- Silver task orchestration is defined in `resources/jobs.yml`.
+- Schema naming is defined in `resources/schemas.yml`.
+
+## Variables
+- `silver_post_impressions`, `silver_post_engagements`, `silver_post_metadata`, `silver_profile_followers`, `silver_profile_metrics`: silver table names.
+- `bronze_*_table` and `bronze_staging_*_prefix`: input sources for silver transformations.
+
 ## Reference
 - See `resources/schemas.yml` for canonical schema naming and `resources/variables.yml` for table names.

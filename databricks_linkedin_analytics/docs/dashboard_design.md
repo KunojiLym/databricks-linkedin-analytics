@@ -4,8 +4,8 @@ Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yz
 - [Part 7: Dashboard Design for Insights and Impact](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-7-dashboard-design-for-insights-and-impact/) 
 
 ## Artifacts
-- `src/linkedin_analytics_jobs/4. data product/LinkedIn Statistics.lvdash.json` — dashboard definition exported from the visualization tool
-- `resources/dashboards.yml` — dashboard resource configuration for bundle deployment
+- `src/linkedin_analytics_jobs/4. data product/LinkedIn Statistics.lvdash.json` - dashboard definition exported from the visualization tool
+- `resources/dashboards.yml` - dashboard resource configuration for bundle deployment
 
 ## Design goals
 - Surface trends (impressions, engagement rate) over time
@@ -22,3 +22,16 @@ Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yz
 
 ## Operational notes
 - Dashboard refresh is in the job pipeline (`resources/jobs.yml`) after the gold pipeline completes.
+
+## Configuration
+- Dashboard deployment lives in `resources/dashboards.yml`.
+- Refresh orchestration is defined in `resources/jobs.yml` (dashboard task).
+
+## Variables
+- `dashboard_subscriber`: email or user name that receives dashboard updates.
+- `warehouse_id`: SQL warehouse used to render dashboard queries.
+- `gold_catalog`, `common_schema`, `gold_fact_daily_post_statistics_table`, `gold_fact_daily_profile_statistics_table`: table locations for dashboard queries.
+
+## Reference
+- Dashboard artifact: `src/linkedin_analytics_jobs/4. data product/LinkedIn Statistics.lvdash.json`
+- Gold models: `docs/modeling.md` and `src/linkedin_analytics_jobs/3. gold modelling/pipeline_gold_create/`

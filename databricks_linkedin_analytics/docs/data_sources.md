@@ -21,9 +21,22 @@ This project ingests LinkedIn profile and content metrics exported as Excel/CSV 
 - Per-post metrics: post id, timestamp, impressions, likes, comments, shares
 
 ## Where to find ingestion examples
-- `src/linkedin_analytics_jobs/1. bronze ingestion/bronze daily ingest.ipynb` — daily Excel ingestion
-- `src/linkedin_analytics_jobs/1. bronze ingestion/bronze historical ingest.ipynb` — historical batch ingest
-- `src/linkedin_analytics_jobs/1. bronze ingestion/bronze post ingest.ipynb` — post-level ingest
+- `src/linkedin_analytics_jobs/1. bronze ingestion/bronze daily ingest.ipynb` - daily Excel ingestion
+- `src/linkedin_analytics_jobs/1. bronze ingestion/bronze historical ingest.ipynb` - historical batch ingest
+- `src/linkedin_analytics_jobs/1. bronze ingestion/bronze post ingest.ipynb` - post-level ingest
 
 ## If you extend sources
 - Document expected file layout and column names in this doc and add a notebook under `src/` showing how to ingest it.
+
+## Configuration
+- Landing schemas and volumes are defined in `resources/schemas.yml`.
+- File-arrival triggers and ingest jobs are defined in `resources/jobs.yml`.
+
+## Variables
+- `landing_catalog`, `landing_content_daily_volume`, `landing_content_historical_volume`, `landing_posts_volume`, `landing_patch_volume`: landing storage locations.
+- `ingestion_folder`, `processed_folder`, `errors_folder`: input/output folders for ingest.
+- `bronze_*_table`: bronze table names used by ingestion notebooks.
+
+## Reference
+- Ingest notebooks: `src/linkedin_analytics_jobs/1. bronze ingestion/`
+- Variable definitions: `resources/variables.yml`
