@@ -80,6 +80,10 @@ resources:
       queue:
         enabled: true
       performance_target: PERFORMANCE_OPTIMIZED
+      email_notifications:
+        on_failure:
+          - ${var.support_email}
+        no_alert_for_skipped_runs: true
     linkedin_daily_ingest:
       name: linkedin daily ingest
       trigger:
@@ -141,6 +145,10 @@ resources:
       queue:
         enabled: true
       performance_target: PERFORMANCE_OPTIMIZED
+      email_notifications:
+        on_failure:
+          - ${var.support_email}
+        no_alert_for_skipped_runs: true
     linkedin_historical_ingestion:
       name: linkedin historical ingestion
       trigger:
@@ -175,6 +183,10 @@ resources:
       queue:
         enabled: true
       performance_target: PERFORMANCE_OPTIMIZED
+      email_notifications:
+        on_failure:
+          - ${var.support_email}
+        no_alert_for_skipped_runs: true
     linkedin_post_ingest:
       name: linkedin post ingest
       trigger:
@@ -210,6 +222,10 @@ resources:
       queue:
         enabled: true
       performance_target: PERFORMANCE_OPTIMIZED
+      email_notifications:
+        on_failure:
+          - ${var.support_email}
+        no_alert_for_skipped_runs: true
     linkedin_post_patch_ingest:
       name: linkedin post patch ingest
       trigger:
@@ -245,4 +261,7 @@ resources:
       queue:
         enabled: true
       performance_target: PERFORMANCE_OPTIMIZED
-
+      email_notifications:
+        on_failure:
+          - ${var.support_email}
+        no_alert_for_skipped_runs: true

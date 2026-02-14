@@ -2,10 +2,18 @@ variables:
 
   linkedin_profile_name:
     description: The name of the LinkedIn profile
+
+  # 0. Settings for the workspace
   warehouse_id:
     description: The ID of the Databricks SQL warehouse cluster
   pipeline_runner:
     description: The name of the service principal used to deploy the DAB and run the pipelines
+  support_email:
+    description: The support email for notifications
+    default: ${workspace.current_user.userName}
+  monitoring_folder:
+    description: The folder in the Databricks workspace for storing quality monitoring dashboards
+    default: /Workspace/Users/${workspace.current_user.email}/databricks_lakehouse_monitoring
 
   # 1. Settings for the medallion layer catalogs and schemas
   landing_catalog: 
