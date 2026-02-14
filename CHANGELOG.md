@@ -10,6 +10,9 @@ Format follows a simple "Unreleased / YYYY-MM-DD" style. When making changes, ad
 - Monitoring resources, email notification configuration, and related pipeline/job variables.
 - Additional .gitignore rules.
 
+### Fixed
+- Default support email now uses the workspace user email to ensure notification delivery.
+
 ---
 
 ## [2026-01-19] - Initial docs consolidation
