@@ -10,7 +10,7 @@ variables:
     description: The name of the service principal used to deploy the DAB and run the pipelines
   support_email:
     description: The support email for notifications
-    default: ${workspace.current_user.userName}
+    default: ${workspace.current_user.email}
   monitoring_folder:
     description: The folder in the Databricks workspace for storing quality monitoring dashboards
     default: /Workspace/Users/${workspace.current_user.email}/databricks_lakehouse_monitoring
