@@ -1,4 +1,4 @@
-# TODO — Tasks, Improvements, and Next Steps
+# TODO - Tasks, Improvements, and Next Steps
 
 This TODO list consolidates actionable items and suggested next steps derived from the repository's "Key takeaways" and ongoing maintenance needs. Items are short and prioritized so contributors can pick small, well-scoped tasks.
 
@@ -18,11 +18,11 @@ Medium priority
 - [ ] Create `docs/diagrams.svg` or `docs/images/architecture.svg` for the medallion flow.
 - [ ] Add small sample dataset files (anonymized) to `tests/fixtures/` for faster local iteration.
 
-Architecture & modeling
+Architecture and modeling
 - [ ] Document partitioning and performance recommendations for gold fact tables (add a short note to `docs/modeling.md`).
 - [ ] Add a short note in `docs/modeling.md` linking to `src/.../pipeline_gold_create/*.sql` for schema details.
 
-Orchestration & operations
+Orchestration and operations
 - [ ] Add example `dbx` or `databricks` CLI commands for CI/CD in `docs/quickstart.md` (if desired and tested).
 - [ ] Add minimal monitoring SQL examples in `docs/observability.md` (daily freshness checks and row-count anomaly checks).
 
@@ -40,3 +40,13 @@ Nice-to-have (lower priority)
 
 How to mark progress
 - When completing a task: mark the checkbox, open a PR, and add a brief `CHANGELOG.md` entry under `Unreleased` (one-liner).
+
+## Configuration
+- Primary configuration lives in `databricks_linkedin_analytics/databricks.yml` and `databricks_linkedin_analytics/resources/*.yml`.
+
+## Variables
+- Default values are defined in `databricks_linkedin_analytics/resources/variables.yml` and may be overridden per target.
+
+## Reference
+- Doc index: `docs/README.md`
+- Changelog: `CHANGELOG.md`

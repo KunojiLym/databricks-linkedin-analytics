@@ -1,4 +1,4 @@
-# Quickstart — Deploy to Databricks (Dev) and run notebooks
+# Quickstart - Deploy to Databricks (Dev) and run notebooks
 
 This quickstart gives exact commands and environment overview to deploy the `databricks_linkedin_analytics` bundle to a Databricks development workspace and run notebooks locally when applicable.
 
@@ -10,9 +10,9 @@ Prerequisites
 - `papermill` or `nbconvert` if you want to execute notebooks locally
 
 Environment variables (recommended)
-- DATABRICKS_HOST — your Databricks workspace URL
-- DATABRICKS_TOKEN — personal access token
-- LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET — LinkedIn API credentials (store securely)
+- DATABRICKS_HOST - your Databricks workspace URL
+- DATABRICKS_TOKEN - personal access token
+- LINKEDIN_CLIENT_ID, LINKEDIN_CLIENT_SECRET - LinkedIn API credentials (store securely)
 - Optional override variables referenced in `resources/variables.yml` (e.g., catalogs, schemas, volumes)
 
 Quick deploy (Databricks Bundle)
@@ -64,6 +64,18 @@ Guidance
 - Do not commit secrets or tokens into this file. If you need to store secrets for CI or shared environments, use secret stores (Databricks secrets, environment variables, or CI secrets).
 - If you keep a local `variable-overrides.json` for convenience, add `.databricks/bundle/*/variable-overrides.json` to your global or repo `.gitignore` to avoid accidental commits.
 - For production deployments, prefer passing variables via secure CI/CD pipelines or Databricks workspace variables instead of committing overrides in the repo.
+
+## Configuration
+- Bundle targets and environment settings: `databricks_linkedin_analytics/databricks.yml`
+- Resources (jobs, pipelines, dashboards, monitoring): `databricks_linkedin_analytics/resources/*.yml`
+
+## Variables
+- Base defaults: `databricks_linkedin_analytics/resources/variables.yml`
+- Override file: `.databricks/bundle/<target>/variable-overrides.json`
+
+## Reference
+- Orchestration: `docs/orchestration.md`
+- Ingestion: `docs/ingestion.md`
 
 Troubleshooting
 - If your deploy fails due to missing variables, check this overrides file as well as `resources/variables.yml` for required keys.

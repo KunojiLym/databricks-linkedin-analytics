@@ -24,3 +24,13 @@ Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yz
 ## Refactoring tips
 - Move commonly-reused functions (parsing, date helpers) from notebooks into a `src/` Python module
 - Keep notebooks lightweight and use `%run` or module imports for shared code
+
+## Configuration
+- Bundle and resource definitions live in `databricks_linkedin_analytics/databricks.yml` and `databricks_linkedin_analytics/resources/*.yml`.
+
+## Variables
+- Default values live in `databricks_linkedin_analytics/resources/variables.yml`; override per target in `.databricks/bundle/<target>/variable-overrides.json` if needed.
+
+## Reference
+- Migration template: `docs/migration_note_template.md`
+- Documentation hygiene: `docs/documentation_hygiene.md`
