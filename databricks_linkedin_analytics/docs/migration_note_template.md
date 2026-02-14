@@ -39,7 +39,7 @@ Rollback plan
 - Steps to revert in case of failure (restore snapshot, re-run previous pipeline)
 
 Change log entry
-- Provide the one-line `CHANGELOG.md` entry to add under `Unreleased`.
+- Provide the one-line `CHANGELOG.md` entry to add under the latest dated section.
 
 Tests
 - Describe tests to validate the migration (unit tests, notebook smoke runs, SQL validations)

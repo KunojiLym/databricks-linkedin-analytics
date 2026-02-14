@@ -31,7 +31,7 @@ Maintainability
 - [ ] Add a short migration note template in `docs/maintainability.md` to document schema changes and backfill plans.
 
 Documentation hygiene
-- [ ] Keep docs short and high-level. If a doc change affects behavior, add a short changelog item under `Unreleased` in `CHANGELOG.md`.
+- [ ] Keep docs short and high-level. If a doc change affects behavior, add a short changelog item under the latest dated section in `CHANGELOG.md`.
 - [ ] Link key notebooks and SQL files from docs pages rather than embedding code snippets to reduce duplication.
 
 Nice-to-have (lower priority)
@@ -39,7 +39,7 @@ Nice-to-have (lower priority)
 - [ ] Add a small dashboard health badge (if you have a monitoring endpoint) to the README.
 
 How to mark progress
-- When completing a task: mark the checkbox, open a PR, and add a brief `CHANGELOG.md` entry under `Unreleased` (one-liner).
+- When completing a task: mark the checkbox, open a PR, and add a brief `CHANGELOG.md` entry under the latest dated section (one-liner).
 
 ## Configuration
 - Primary configuration lives in `databricks_linkedin_analytics/databricks.yml` and `databricks_linkedin_analytics/resources/*.yml`.

@@ -8,5 +8,5 @@ part6: { doc: docs/modeling.md, blog: "Part 6", files: ["src/linkedin_analytics_
 part7: { doc: docs/dashboard_design.md, blog: "Part 7", files: ["src/.../4. data product/LinkedIn Statistics.lvdash.json", "resources/dashboards.yml"] }
 part8: { doc: docs/orchestration.md, blog: "Part 8", files: ["resources/pipelines.yml", "resources/jobs.yml"] }
 part9: { doc: docs/maintainability.md, blog: "Part 9", files: ["resources/variables.yml", "resources/schemas.yml"] }
-part10: { doc: docs/observability.md, blog: "Part 10", files: ["resources/jobs.yml"] }
+part10: { doc: docs/observability.md, blog: "Part 10", files: ["resources/jobs.yml", "resources/monitoring.yml", "resources/pipelines.yml", "resources/variables.yml"] }
 part11: { doc: docs/TODO.md, blog: "Part 11", files: ["docs/*"] }

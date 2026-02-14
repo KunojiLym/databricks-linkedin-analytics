@@ -14,14 +14,14 @@
 - Single source of truth: annotate the code (notebooks/SQL) with in-file comments; docs should summarize and link.
 
 ## Changelog and traceability
-- If a doc change affects behavior (e.g., configuration names, required variables), add a one-line entry under `Unreleased` in `CHANGELOG.md`.
+- If a doc change affects behavior (e.g., configuration names, required variables), add a one-line entry under the latest dated section in `CHANGELOG.md`.
 - For schema or breaking changes, use the migration template: `docs/migration_note_template.md` and add a linked changelog entry.
 
 ## Doc checklist (for PRs)
 - [ ] Is the page short and focused on intent or navigation?
 - [ ] Does the doc link directly to the authoritative file(s)? (notebook, SQL, or YAML)
 - [ ] If a code example is included, is it <= 5 lines and clearly labeled as excerpt?
-- [ ] If the change affects behavior/config, was `CHANGELOG.md` updated under `Unreleased`?
+- [ ] If the change affects behavior/config, was `CHANGELOG.md` updated under the latest dated section?
 
 ## Examples
 - **Good:** "See `src/.../silver impressions consolidation.ipynb` for the exact transformation logic." (link)
