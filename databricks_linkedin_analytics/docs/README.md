@@ -8,6 +8,7 @@ This is the consolidated documentation index. The goal is to be easy to navigate
 
 ## Navigation (one-line summaries)
 - `docs/quickstart.md` — Quick start to deploy the project to Databricks (commands and env vars).
+- `docs/AGENTS.md` — Setup and usage guide for AI coding assistants (GitHub Copilot, Cursor, Claude, Codex, JetBrains AI Chat).
 - `docs/architecture.md` — System architecture and medallion layer overview (Landing → Bronze → Silver → Gold).
 - `docs/data_sources.md` — Sources and expected file shapes; where to add new sources.
 - `docs/ingestion.md` — Bronze ingestion patterns; where to find daily and historical ingest notebooks.

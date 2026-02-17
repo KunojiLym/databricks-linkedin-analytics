@@ -5,12 +5,16 @@ Maps to the following posts in [Build Your Own LinkedIn Analytics](https://www.y
 - [Part 4: Ingesting Data](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-4-ingesting-data/) 
 
 ## Goals of the bronze layer
+- Ingest Excel files from the landing volume (assumed already downloaded from LinkedIn analytics interface)
 - Capture raw data as-is with minimal transformation
 - Keep ingestion idempotent and traceable (source filename, load timestamp, status)
 
 ## Notebooks and flows
+
+**Note:** This repository covers ingestion from the landing volume into bronze. Excel files are assumed to be already downloaded from the LinkedIn analytics interface and placed in the landing volume (external process, not covered here).
+
 - Daily ingest: `src/linkedin_analytics_jobs/1. bronze ingestion/bronze daily ingest.ipynb`
-  - Steps: discover files in landing volume → parse Excel → normalize columns → write Delta table
+  - Steps: discover Excel files in landing volume pending folder → parse Excel → normalize columns → write Delta table → move file to processed folder
 - Historical ingest: `bronze historical ingest.ipynb` — larger files and backfill patterns
 - Post ingest and patching: `bronze post ingest.ipynb` and `bronze post patch ingest.ipynb`
 
@@ -24,7 +28,20 @@ Maps to the following posts in [Build Your Own LinkedIn Analytics](https://www.y
 - For scheduled automated runs, see `resources/jobs.yml` which defines the ingest job triggers.
 
 ## Variables
-- Many ingestion behaviors are driven by `resources/variables.yml` (volume names, pending/processed folders). Review and update those defaults for your environment.
+- Many ingestion behaviors are driven by `resources/variables.yml` (landing volume names, pending/processed folder paths). Review and update those defaults for your environment.
+- The landing volume is assumed to have `pending/` and `processed/` subdirectories for file organization.
+
+## Landing volume setup (external to this repo)
+This repository assumes Excel files are already in the landing volume. The actual download from the LinkedIn analytics interface is **external to this repository**. 
+
+**To set up:**
+1. Create a landing volume in Databricks (e.g., `/Volumes/linq_landing/`)
+2. Create `pending/` and `processed/` subdirectories
+3. Manually download Excel files from LinkedIn analytics interface and upload to the `pending/` folder
+4. Configure `resources/variables.yml` with the landing volume path
+5. Run the bronze ingestion notebooks, which will move processed files to the `processed/` folder
 
 ## Troubleshooting
-- If a file fails, check the `errors` folder in the landing volume and job run logs for stack traces.
+- If files aren't being discovered, verify they're in the `pending/` folder of the landing volume configured in `resources/variables.yml`
+- If a file fails to ingest, check the `errors` folder in the landing volume and job run logs for stack traces.
+- Ensure Excel files are properly formatted and located; the job cannot download them from LinkedIn analytics interface (that's an external process).
