@@ -1,0 +1,242 @@
+# Cursor AI Rules for databricks-linkedin-analytics
+# https://docs.cursor.com/context/cursor-rules
+
+## Project Overview
+This is a Databricks medallion architecture reference implementation for LinkedIn analytics.
+
+### Architecture Layers
+- **Bronze**: Raw data ingestion from Excel files in landing volume (manually uploaded from LinkedIn analytics interface, not covered by this repo) (src/linkedin_analytics_jobs/1. bronze ingestion/)
+- **Silver**: Data consolidation, deduplication, and enrichment (src/linkedin_analytics_jobs/2. silver transformation/)
+- **Gold**: Dimensional modeling and fact tables (src/linkedin_analytics_jobs/3. gold modelling/)
+- **Data Products**: Dashboards and downstream analytics (src/linkedin_analytics_jobs/4. data product/)
+
+### Key Technologies
+- Python 3.10–3.13
+- PySpark / Databricks
+- SQL (Spark SQL / T-SQL)
+- Jupyter Notebooks (.ipynb)
+- Databricks Asset Bundles (databricks.yml)
+- Delta Lake
+- YAML configuration (resources/)
+
+---
+
+## Code Style & Standards
+
+### Python Code Style
+- **Formatter**: Black (line length: 125)
+- **Linter**: pytest for testing
+- **Import style**: Organize with standard library first, then third-party, then local imports
+- **Type hints**: Preferred where feasible (Python 3.10+)
+- **Docstrings**: Use NumPy style docstrings for complex functions
+
+### SQL Style
+- **Dialect**: Spark SQL (compatible with Databricks)
+- **Keywords**: UPPERCASE (SELECT, FROM, WHERE, JOIN, etc.)
+- **Aliases**: Both table and column aliases required for readability
+- **Naming**: 
+  - Tables: `{layer}_{business_object}` (e.g., `silver_engagements`, `fct_daily_post_stats`)
+  - Columns: `snake_case`
+  - Date columns: Suffix with `_date` or `_key` (for dimensional tables)
+
+### Naming Conventions
+- **Schemas**: `linkedin_analytics_{bronze|silver|gold}`
+- **Bronze tables**: `bronze_*` (raw, one-to-one with source)
+- **Silver tables**: `silver_*` (cleansed, deduplicated)
+- **Gold tables**: `fct_*` (facts), `dim_*` (dimensions)
+- **Notebooks**: Descriptive verb phrase with layer prefix (e.g., "silver engagements consolidation.ipynb")
+
+### YAML Configuration
+- **File Structure**: 2-space indentation (no tabs)
+- **Key naming**: `snake_case`
+- **Comments**: Use `#` for section headers and inline documentation
+- **Validation**: All YAML must be syntactically valid (use online validators)
+
+---
+
+## File Organization & Focus Areas
+
+### Primary Development Areas
+- **Notebooks**: `src/linkedin_analytics_jobs/` — All transformation logic
+- **SQL DDL**: `src/linkedin_analytics_jobs/3. gold modelling/pipeline_gold_create/` — Dimensional models
+- **Configuration**: `resources/` — Jobs, pipelines, schemas, variables
+- **Documentation**: `docs/` — Architecture, design, and operational guides
+
+### File Patterns to Focus On
+✅ **Focus AI suggestions on:**
+- `.ipynb` files (Jupyter notebooks)
+- `.sql` files (DDL and transformations)
+- `.yml` files in `resources/` (Databricks Asset Bundle configs)
+- `.md` files in `docs/` (documentation)
+
+❌ **Avoid AI modifications to:**
+- `.dbc` files (compiled Databricks notebooks)
+- Credentials, secrets, or auth tokens
+- Large data files (parquet, delta)
+- Binary files
+
+---
+
+## Do's ✅
+
+1. **Context before changes**: Always reference the medallion layer (Bronze/Silver/Gold) when suggesting modifications
+2. **Link to source**: When explaining transformations, reference specific notebooks or SQL files
+3. **Validate patterns**: Check existing code in the project before suggesting patterns
+4. **Test suggestions**: Verify that generated code follows Python 3.10+ and PySpark conventions
+5. **Documentation**: Update [docs/](./docs/) when suggesting architectural changes
+6. **Follow conventions**: Use naming patterns and style from existing notebooks and SQL files
+7. **Use schema context**: Reference actual table names from [resources/schemas.yml](./resources/schemas.yml)
+
+## Don'ts ❌
+
+1. **Don't expose credentials**: Never suggest code that hard-codes LinkedIn Company Page API keys, tokens, or secrets
+2. **Don't break conventions**: Don't suggest changes that deviate from the medallion pattern
+3. **Don't assume table names**: Always verify table and schema names exist before suggesting joins
+4. **Don't bypass testing**: Don't suggest skipping unit tests or validation  
+5. **Don't modify production configs**: Changes to orchestration should be reviewed before deployment
+6. **Don't ignore dependencies**: Reference [pyproject.toml](./pyproject.toml) for available packages
+7. **Don't directly commit changes**: Always review AI suggestions; use them as starting points
+
+---
+
+## Transformation Guidelines
+
+### Bronze Layer (Ingestion from Excel)
+- **Goal**: Load raw data from Excel files already in the landing volume (manually uploaded from LinkedIn analytics interface) with minimal transformation (infrastructure supports LinkedIn Company Page API where available)
+- **Pattern**: Discover Excel file in landing pending folder, parse, add metadata (load_timestamp, file_source), validate schemas, persist to bronze Delta table, move file to processed folder
+- **Error handling**: Log failures; don't fail the job on malformed records (handle missing columns, type mismatches)
+- **Reference**: [src/linkedin_analytics_jobs/1. bronze ingestion/](./src/linkedin_analytics_jobs/1.%20bronze%20ingestion/)
+
+### Silver Layer (Cleansing & Consolidation)
+- **Goal**: Consolidate, deduplicate, enrich
+- **Pattern**: Join to dimension data, filter valid records, aggregate to business metrics
+- **Quality checks**: Filter for completeness, validate dates, check for duplicates
+- **Reference**: [src/linkedin_analytics_jobs/2. silver transformation/](./src/linkedin_analytics_jobs/2.%20silver%20transformation/)
+
+### Gold Layer (Dimensional Modeling)
+- **Goal**: Create analysis-ready dimension and fact tables
+- **Pattern**: Snowflake schema with dim_* and fct_* tables
+- **Keys**: Surrogate keys (sequence-generated), natural keys (business identifiers)
+- **Reference**: [src/linkedin_analytics_jobs/3. gold modelling/pipeline_gold_create/](./src/linkedin_analytics_jobs/3.%20gold%20modelling/pipeline_gold_create/)
+
+---
+
+## Common Transformation Patterns
+
+### Deduplication (Silver layer)
+```python
+# Keep most recent record; prefer:
+df.window('post_id', 'date').rank().filter(col('rank') == 1)
+# Over: group by + max(row_number) — cleaner, more efficient
+```
+
+### Aggregation (Silver to Gold)
+```sql
+-- Prefer explicit column lists and window functions:
+SELECT 
+  post_id, 
+  date_id,
+  COUNT(*) as impression_count,
+  SUM(engagement_count) as total_engagements,
+  ROW_NUMBER() OVER (PARTITION BY post_id ORDER BY date_id DESC) as recency_rank
+FROM silver_impressions
+GROUP BY post_id, date_id
+```
+
+### Dimensional Joins (Gold layer)
+```sql
+-- Always use surrogate keys for fact tables:
+SELECT 
+  fct.fact_id,
+  dim_date.date_sk,
+  dim_post.post_sk,
+  fct.metric_value
+FROM fct_daily_post_stats fct
+JOIN dim_date ON fct.date_id = dim_date.date_id
+JOIN dim_post ON fct.post_id = dim_post.post_id
+```
+
+---
+
+## Configuration Guidelines
+
+### Job Configuration (jobs.yml)
+- Every job should have a clear name and description
+- All jobs should tag by layer: `tags: { layer: silver }`
+- Include retry logic for transient failures
+- Set timeout appropriate to layer (Bronze faster, Gold slower for modeling)
+
+### Pipeline Configuration (pipelines.yml)
+- Delta Live Tables (DLT) for orchestration
+- Use expectations for data quality assertions
+- Reference variables from [resources/variables.yml](./resources/variables.yml)
+
+### Schema Configuration (schemas.yml)
+- Define all table schemas explicitly
+- Include descriptions for each field
+- Mark primary/foreign keys
+- Reference bronze/silver/gold naming
+
+---
+
+## Documentation Standards
+
+### When to Document
+- Any new transformation logic: Add explanation in notebook markdown or create docs/ entry
+- Configuration changes: Update CHANGELOG.md under "Unreleased"
+- Architecture changes: Update [docs/architecture.md](./docs/architecture.md)
+
+### How to Document
+- Keep pages short (<500 words); link to code rather than duplicate
+- Use relative paths: `[file_name](src/linkedin_analytics_jobs/...)`
+- Reference [documentation_hygiene.md](./docs/documentation_hygiene.md) for style
+- Always update [CHANGELOG.md](./CHANGELOG.md) top-level for user-facing changes
+
+---
+
+## Integration with Project Tools
+
+### Databricks CLI Integration
+- Project uses `databricks bundle deploy` for deployment
+- Configuration in [databricks.yml](./databricks.yml)
+- Use environment-specific overrides in `.databricks/bundle/{dev|staging|prod}/`
+
+### Testing
+- Unit tests in pytest
+- Run: `pytest` (check [pyproject.toml](./pyproject.toml) for target directory)
+- Coverage reports in `coverage/`
+
+### Version Control
+- Branch pattern: `feature/`, `bugfix/`, `hotfix/` prefixes
+- PRs require documentation review and passing tests
+- See [CONTRIBUTING.md](./CONTRIBUTING.md) for full guidelines
+
+---
+
+## Helpful Debugging Context
+
+### Common Issues
+1. **Table not found**: Verify schema name includes layer suffix (e.g., `linkedin_analytics_silver`)
+2. **Column mismatch**: Check source notebook to confirm column names (case-sensitive in Spark SQL)
+3. **Performance**: Check data volumes in [resources/schemas.yml](./resources/schemas.yml); optimize with filters
+4. **Orchestration failures**: Review [resources/jobs.yml](./resources/jobs.yml) and cluster configuration
+
+### When Asking Cursor for Help
+- **Code review**: "Review this notebook for performance issues" + paste notebook
+- **Ingestion**: "Improve this Excel file reader to handle missing columns and data type mismatches from the landing volume"
+- **Transformation**: "Suggest a silver layer transformation that consolidates X and deduplicates by Y"
+- **SQL generation**: "Create a fact table DDL that joins dim_date and dim_post, aggregating metrics"
+- **Documentation**: "Write a quickstart for new contributors on the medallion pattern"
+
+---
+
+## Quick Reference Links
+
+- [README.md](./README.md) — Project overview
+- [docs/AGENTS.md](./docs/AGENTS.md) — AI assistant guide (this file's companion)
+- [docs/architecture.md](./docs/architecture.md) — System design
+- [docs/modeling.md](./docs/modeling.md) — Gold layer dimensional patterns
+- [CONTRIBUTING.md](./CONTRIBUTING.md) — Contribution guidelines
+- [pyproject.toml](./pyproject.toml) — Dependencies and build config
+- [databricks.yml](./databricks.yml) — Bundle configuration
+- [resources/](./resources/) — YAML configs (dashboards, jobs, pipelines, schemas)

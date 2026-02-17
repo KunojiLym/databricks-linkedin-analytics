@@ -7,17 +7,17 @@ This is the consolidated documentation index. The goal is to be easy to navigate
 - Implementation details live in the notebooks (`src/.../*.ipynb`), SQL files (`src/.../*.sql`) and resource YAML files (`databricks_linkedin_analytics/resources/*.yml`).
 
 ## Navigation (one-line summaries)
-- `docs/quickstart.md` - Quick start to deploy the project to Databricks (commands and env vars).
-- `docs/architecture.md` - System architecture and medallion layer overview (Landing -> Bronze -> Silver -> Gold).
-- `docs/data_sources.md` - Sources and expected file shapes; where to add new sources.
-- `docs/ingestion.md` - Bronze ingestion patterns; where to find daily and historical ingest notebooks.
-- `docs/transformation.md` - Silver transformation patterns; how notebooks map to silver tables.
-- `docs/modeling.md` - Gold modeling and the fact/dimension tables used by dashboards.
-- `docs/dashboard_design.md` - Dashboard goals and the LinkedIn Statistics data product.
-- `docs/orchestration.md` - Job/pipeline wiring, triggers, and failure-retry guidance.
-- `docs/maintainability.md` - How to keep the pipeline maintainable and where to edit configuration.
-- `docs/observability.md` - What to monitor and quick SQL checks for pipeline health.
-- `docs/TODO.md` - Actionable tasks and prioritized next steps for maintainers.
+- `docs/quickstart.md` — Quick start to deploy the project to Databricks (commands and env vars).
+- `docs/architecture.md` — System architecture and medallion layer overview (Landing → Bronze → Silver → Gold).
+- `docs/data_sources.md` — Sources and expected file shapes; where to add new sources.
+- `docs/ingestion.md` — Bronze ingestion patterns; where to find daily and historical ingest notebooks.
+- `docs/transformation.md` — Silver transformation patterns; how notebooks map to silver tables.
+- `docs/modeling.md` — Gold modeling and the fact/dimension tables used by dashboards.
+- `docs/dashboard_design.md` — Dashboard goals and the LinkedIn Statistics data product.
+- `docs/orchestration.md` — Job/pipeline wiring, triggers, and failure-retry guidance.
+- `docs/maintainability.md` — How to keep the pipeline maintainable and where to edit configuration.
+- `docs/observability.md` — What to monitor and quick SQL checks for pipeline health.
+- `docs/TODO.md` — Actionable tasks and prioritized next steps for maintainers.
 
 ## Quick pointers
 - **Code-first:** open notebooks and SQL files in `src/linkedin_analytics_jobs/` for concrete examples.

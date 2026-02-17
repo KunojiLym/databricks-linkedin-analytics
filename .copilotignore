@@ -1,0 +1,76 @@
+# GitHub Copilot Ignore File
+# https://github.blog/changelog/2024-09-16-github-copilot-in-the-platform-now-includes-copilotignore-support/
+
+# Sensitive and credential files
+**.env
+**.env.local
+**.env.*.local
+**/.databricks/
+**/.databricks/**
+*.dbc
+*.dbfs
+
+# Credentials and tokens
+**/secrets.yml
+**/credentials.yml
+**/.aws/
+**/.aws/**
+**/.azure/
+**/.azure/**
+**/config
+**/token
+**/*_key*
+**/*_secret*
+
+# Large data files and outputs
+**/*.parquet
+**/*.delta
+**/*.csv
+**/*.xlsx
+**/*.xls
+**/*.json
+**/dist/
+**/build/
+**/target/
+
+# IDE and local environment
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python and package management
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.tox/
+.venv/
+venv/
+env/
+node_modules/
+
+# Build and test artifacts
+*.log
+test-results/
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+temp/
+
+# Lock files (typically large)
+poetry.lock
+package-lock.json
+Pipfile.lock
+
+# Databricks specific
+.databricks/bundle/<env>/state/
+
+# Git
+.git/
+.gitignore
