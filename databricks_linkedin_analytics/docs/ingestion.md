@@ -44,4 +44,17 @@ This repository assumes Excel files are already in the landing volume. The actua
 ## Troubleshooting
 - If files aren't being discovered, verify they're in the `pending/` folder of the landing volume configured in `resources/variables.yml`
 - If a file fails to ingest, check the `errors` folder in the landing volume and job run logs for stack traces.
-- Ensure Excel files are properly formatted and located; the job cannot download them from LinkedIn analytics interface (that's an external process).
+- Ensure Excel files are properly formatted and located; the job cannot download them from LinkedIn analytics interface (that's an external process)
+
+## Configuration
+- Ingest jobs and file-arrival triggers live in `resources/jobs.yml`.
+- Landing volumes and schemas are defined in `resources/schemas.yml`.
+
+## Variables
+- `landing_catalog`, `landing_content_daily_volume`, `landing_content_historical_volume`, `landing_posts_volume`, `landing_patch_volume`: landing storage locations.
+- `ingestion_folder`, `processed_folder`, `errors_folder`, `post_patch_subfolder`: input/output folders for ingest.
+- `bronze_*_table`: bronze table names produced by ingestion.
+
+## Reference
+- Ingest notebooks: `src/linkedin_analytics_jobs/1. bronze ingestion/`
+- Job triggers: `resources/jobs.yml`
