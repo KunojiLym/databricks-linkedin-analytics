@@ -55,7 +55,7 @@ def test_fill_missing_dates(mock_spark):
     mock_unique_keys_df.crossJoin.return_value.join.return_value.fillna.return_value = mock_filled_df
     
     from linkedin_analytics_jobs.utils.pipeline_utils import fill_missing_dates
-    result = fill_missing_dates(mock_spark, mock_df, "analytics_date", ["post_url"], "impressions")
+    result = fill_missing_dates(mock_df, "analytics_date", ["post_url"], "impressions", spark=mock_spark)
     
     assert result == mock_filled_df
     mock_unique_keys_df.crossJoin.assert_called_once_with(mock_date_seq_df)

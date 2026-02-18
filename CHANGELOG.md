@@ -12,8 +12,8 @@ Format follows a simple dated "YYYY-MM-DD" style. Add a dated section when chang
 - **Modular Architecture**: 
     - Created `excel_validator.py` and `file_validation.py` for ingestion logic in App `utils` folder.
     - Centralized pipeline helpers in `pipeline_utils.py` in Jobs `utils` folder for parameter handling and time-series date filling.
-- **Unit Testing Framework**: Implemented 14 tests using `pytest` and `unittest.mock` for local-first verification.
-- **CI/CD Integration**: Added GitHub Actions workflow for automated bundle validation and test execution.
+- **Unit Testing Framework**: Implemented 14 tests using `pytest` and `unittest.mock` for local-first verification. Fixed argument order in `test_pipeline_utils.py` to prevent CI failures in strictly-typed environments.
+- **CI/CD Integration**: Added GitHub Actions workflow for automated bundle validation and test execution. Hardened CI workflow with conditional step execution for safer OSS fork support.
 - **Package Standardization**: Added `__init__.py` files across all directories for proper Python packaging.
 - **Dashboards**: Created "Content Deep Dive" and "Engagement Analysis" pages.
 

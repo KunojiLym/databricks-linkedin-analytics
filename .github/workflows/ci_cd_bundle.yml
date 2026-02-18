@@ -10,6 +10,9 @@ on:
 jobs:
   validate_and_test:
     runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -27,9 +30,6 @@ jobs:
         if: env.DATABRICKS_TOKEN != ''
         run: databricks bundle validate
         working-directory: databricks_linkedin_analytics
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
       - name: Run Unit Tests
         run: |
@@ -40,6 +40,9 @@ jobs:
     needs: validate_and_test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -54,15 +57,11 @@ jobs:
         run: uv sync
 
       - name: Deploy to Dev
+        if: env.DATABRICKS_TOKEN != ''
         run: databricks bundle deploy --target dev
         working-directory: databricks_linkedin_analytics
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
       - name: Deploy App to Dev
+        if: env.DATABRICKS_TOKEN != ''
         run: databricks bundle run --target dev excel_ingestion_app
         working-directory: databricks_linkedin_analytics
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
