@@ -28,5 +28,6 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["databricks_linkedin_analytics"]
 
+
 [tool.black]
 line-length = 125

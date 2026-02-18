@@ -4,6 +4,7 @@ import pandas as pd
 import os
 
 from utils.file_validation import FilenameValidator
+from utils.excel_validator import validate_excel_sheets
 from databricks.sdk import WorkspaceClient
 
 st.set_page_config(page_title="LinkedIn Analytics Ingestion", layout="centered")
@@ -28,17 +29,14 @@ if uploaded_files:
                 continue
 
             # 2. Validate Content (Sheets)
-            try:
-                xl = pd.ExcelFile(uploaded_file)
-                required_sheets = ["DISCOVERY", "ENGAGEMENT", "FOLLOWERS", "TOP POSTS"]
-                missing_sheets = [s for s in required_sheets if s not in xl.sheet_names]
-                if missing_sheets:
-                    st.error(f"❌ Missing required sheets: {', '.join(missing_sheets)}")
-                    continue
-                st.success(f"✅ Valid — all required sheets present.")
-                valid_files.append(uploaded_file)
-            except Exception as e:
-                st.error(f"❌ Error reading file: {e}")
+            required_sheets = ["DISCOVERY", "ENGAGEMENT", "FOLLOWERS", "TOP POSTS"]
+            is_valid, error_msg = validate_excel_sheets(uploaded_file, required_sheets)
+            if not is_valid:
+                st.error(f"❌ {error_msg}")
+                continue
+            
+            st.success(f"✅ Valid — all required sheets present.")
+            valid_files.append(uploaded_file)
 
     # Ingest button — only shown if at least one valid file
     if valid_files:
