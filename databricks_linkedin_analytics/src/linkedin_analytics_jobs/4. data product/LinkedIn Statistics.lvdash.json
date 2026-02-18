@@ -231,21 +231,35 @@
         "    SELECT \r\n",
         "        AVG(impressions) AS avg_impressions_by_weekday, \r\n",
         "        AVG(engagements) AS avg_engagements_by_weekday, \r\n",
+        "        SUM(engagements) / SUM(impressions) AS avg_engagement_rate_by_weekday,\r\n",
         "        weekday\r\n",
         "    FROM IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :FCT_DAILY_POST_STATS_TABLE) daily_stats\r\n",
         "    LEFT JOIN gold.linkedin.dim_date dim_date\r\n",
         "    ON daily_stats.analytics_date = dim_date.date\r\n",
         "    WHERE post_id = 'total'\r\n",
         "    GROUP BY weekday\r\n",
+        "),\r\n",
+        "total_stats AS (\r\n",
+        "    SELECT \r\n",
+        "        post_id,\r\n",
+        "        SUM(impressions) AS total_impressions, \r\n",
+        "        SUM(engagements) AS total_engagements,\r\n",
+        "        SUM(engagements) / SUM(impressions) AS engagement_rate\r\n",
+        "    FROM IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :FCT_DAILY_POST_STATS_TABLE) daily_stats\r\n",
+        "    GROUP BY post_id\r\n",
         ")\r\n",
-        "SELECT \r\n",
-        "    post_id, \r\n",
+        " SELECT \r\n",
+        "    daily_stats.post_id, \r\n",
         "    post_publish_date, \r\n",
         "    post_publish_timestamp, \r\n",
         "    impressions, \r\n",
         "    engagements, \r\n",
         "    avg_impressions_by_weekday,\r\n",
         "    avg_engagements_by_weekday,\r\n",
+        "    total_impressions, \r\n",
+        "    total_engagements,\r\n",
+        "    avg_engagement_rate_by_weekday,\r\n",
+        "    engagement_rate,\r\n",
         "    CAST(analytics_date AS DATE) AS analytics_date, \r\n",
         "    day as analytics_day,\r\n",
         "    month as analytics_month,\r\n",
@@ -264,7 +278,9 @@
         "LEFT JOIN IDENTIFIER (:GOLD_CATALOG || '.' || :GOLD_SCHEMA || '.' || :DIM_DATE_TABLE) dim_date\r\n",
         "ON daily_stats.analytics_date = dim_date.date\r\n",
         "LEFT JOIN avg_stats_by_weekday\r\n",
-        "ON dim_date.weekday = avg_stats_by_weekday.weekday"
+        "ON dim_date.weekday = avg_stats_by_weekday.weekday\r\n",
+        "LEFT JOIN total_stats\r\n",
+        "ON daily_stats.post_id = total_stats.post_id\r\n"
       ],
       "parameters": [
         {
@@ -3073,6 +3089,231 @@
         }
       ],
       "pageType": "PAGE_TYPE_CANVAS"
+    },
+    {
+      "name": "eda36a50",
+      "displayName": "Content deep dive",
+      "layout": [
+        {
+          "widget": {
+            "name": "d0165024",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "post_id",
+                      "expression": "`post_id`"
+                    },
+                    {
+                      "name": "total_engagements",
+                      "expression": "`total_engagements`"
+                    },
+                    {
+                      "name": "total_impressions",
+                      "expression": "`total_impressions`"
+                    },
+                    {
+                      "name": "engagement_rate",
+                      "expression": "`engagement_rate`"
+                    },
+                    {
+                      "name": "content",
+                      "expression": "`content`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "IN_RANGE(`days_since_post`, 0, 0)"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "post_id"
+                  },
+                  {
+                    "fieldName": "total_engagements"
+                  },
+                  {
+                    "fieldName": "total_impressions",
+                    "format": {
+                      "type": "number-plain",
+                      "abbreviation": "none",
+                      "decimalPlaces": {
+                        "type": "exact",
+                        "places": 0
+                      },
+                      "hideGroupSeparator": true
+                    }
+                  },
+                  {
+                    "fieldName": "engagement_rate",
+                    "format": {
+                      "type": "number-percent",
+                      "decimalPlaces": {
+                        "type": "exact",
+                        "places": 2
+                      },
+                      "hideGroupSeparator": true
+                    }
+                  },
+                  {
+                    "fieldName": "content",
+                    "useForSearch": true,
+                    "columnWidth": 700,
+                    "style": {
+                      "type": "basic"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 17
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    },
+    {
+      "name": "068ad014",
+      "displayName": "Engagement analysis",
+      "layout": [
+        {
+          "widget": {
+            "name": "fa3a2e2a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "post_id",
+                      "expression": "`post_id`"
+                    },
+                    {
+                      "name": "total_impressions",
+                      "expression": "`total_impressions`"
+                    },
+                    {
+                      "name": "total_engagements",
+                      "expression": "`total_engagements`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "IN_RANGE(`days_since_post`, 0, 0)"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "scatter",
+              "encodings": {
+                "x": {
+                  "fieldName": "total_impressions",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "total_engagements",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "post_id",
+                  "legend": {
+                    "hide": true
+                  },
+                  "scale": {
+                    "type": "categorical"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 8,
+            "height": 15
+          }
+        },
+        {
+          "widget": {
+            "name": "21c0aa3b",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "analytics_weekday",
+                      "expression": "`analytics_weekday`"
+                    },
+                    {
+                      "name": "avg(avg_engagements_by_weekday)",
+                      "expression": "AVG(`avg_engagements_by_weekday`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "analytics_weekday",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(avg_engagements_by_weekday)",
+                  "axis": {
+                    "title": "Average engagement"
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 0,
+            "width": 4,
+            "height": 15
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
     }
   ],
   "uiSettings": {
