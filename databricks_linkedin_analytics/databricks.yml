@@ -17,11 +17,11 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://dbc-f9790a9f-76d6.cloud.databricks.com
+      host: ${{ secrets.DATABRICKS_HOST_DEV }}
   prod:
     mode: production
     workspace:
-      host: https://dbc-f9790a9f-76d6.cloud.databricks.com
+      host: ${{ secrets.DATABRICKS_HOST_PRD }}
       # We explicitly deploy to /Workspace/Users/<current user> to make sure we only have a single copy in the workspace.
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     run_as:

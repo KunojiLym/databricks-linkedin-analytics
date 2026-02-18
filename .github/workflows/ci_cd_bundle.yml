@@ -24,6 +24,7 @@ jobs:
         run: uv sync
 
       - name: Validate Bundle
+        if: env.DATABRICKS_TOKEN != ''
         run: databricks bundle validate
         working-directory: databricks_linkedin_analytics
         env:

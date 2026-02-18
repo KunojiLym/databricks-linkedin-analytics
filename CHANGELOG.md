@@ -21,6 +21,10 @@ Format follows a simple dated "YYYY-MM-DD" style. Add a dated section when chang
 - **Resource Management**: Extracted application-specific configurations into a dedicated `resources/apps.yml`.
 - **Notebook Synchronization**: Patched silver transformation notebooks to use centralized utilities with robust pathing.
 
+### Maintainability & CI/CD
+- **Centralized Secrets**: Optimized GitHub Actions to use job-level environment variables for Databricks authentication.
+- **Graceful CI**: Configured workflow steps to automatically skip host-dependent validation in forked repositories while maintaining 100% unit test coverage for all contributors.
+
 ### Documentation
 - Significant updates to `README.md`, `quickstart.md`, and `maintainability.md` covering new testing patterns and development workflows.
 
