@@ -25,6 +25,7 @@ jobs:
 
       - name: Validate Bundle
         run: databricks bundle validate
+        working-directory: databricks_linkedin_analytics
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
@@ -53,6 +54,13 @@ jobs:
 
       - name: Deploy to Dev
         run: databricks bundle deploy --target dev
+        working-directory: databricks_linkedin_analytics
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+      - name: Deploy App to Dev
+        run: databricks bundle run --target dev excel_ingestion_app
         working-directory: databricks_linkedin_analytics
         env:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
