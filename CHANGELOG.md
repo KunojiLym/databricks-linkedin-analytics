@@ -4,6 +4,28 @@ All notable changes to this repository will be documented in this file.
 
 Format follows a simple dated "YYYY-MM-DD" style. Add a dated section when changes are merged; use `Unreleased` only if you later adopt a formal release workflow.
 
+## [2026-02-19]
+
+### Added
+- **Excel Ingestion App**: Implemented a Streamlit-based Databricks App for multi-file Excel uploads to Unity Catalog.
+- **Genie Space**: Instructions for manually deploying Databricks Genie for AI-powered data analytics.
+- **Modular Architecture**: 
+    - Created `excel_validator.py` and `file_validation.py` for ingestion logic in App `utils` folder.
+    - Centralized pipeline helpers in `pipeline_utils.py` in Jobs `utils` folder for parameter handling and time-series date filling.
+- **Unit Testing Framework**: Implemented 14 tests using `pytest` and `unittest.mock` for local-first verification.
+- **CI/CD Integration**: Added GitHub Actions workflow for automated bundle validation and test execution.
+- **Package Standardization**: Added `__init__.py` files across all directories for proper Python packaging.
+- **Dashboards**: Created "Content Deep Dive" and "Engagement Analysis" pages.
+
+### Refactored
+- **Resource Management**: Extracted application-specific configurations into a dedicated `resources/apps.yml`.
+- **Notebook Synchronization**: Patched silver transformation notebooks to use centralized utilities with robust pathing.
+
+### Documentation
+- Significant updates to `README.md`, `quickstart.md`, and `maintainability.md` covering new testing patterns and development workflows.
+
+---
+
 ## [2026-02-18]
 
 ### Added

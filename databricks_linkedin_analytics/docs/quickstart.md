@@ -65,6 +65,25 @@ Guidance
 - If you keep a local `variable-overrides.json` for convenience, add `.databricks/bundle/*/variable-overrides.json` to your global or repo `.gitignore` to avoid accidental commits.
 - For production deployments, prefer passing variables via secure CI/CD pipelines or Databricks workspace variables instead of committing overrides in the repo.
 
+## 4. Quality & Testing
+
+This project includes a suite of unit tests to verify core logic and prevent regressions.
+
+### Running tests locally
+We use `pytest` and `uv` to manage the test environment. You can run tests locally without an active Databricks connection:
+
+```bash
+# Navigate to the bundle directory
+cd databricks_linkedin_analytics
+
+# Install dependencies and run tests
+uv sync
+uv run pytest
+```
+
+### CI/CD
+A GitHub Actions workflow (`.github/workflows/ci_cd_bundle.yml`) automatically runs tests and validates bundle syntax on every pull request.
+
 ## Configuration
 - Bundle targets and environment settings: `databricks_linkedin_analytics/databricks.yml`
 - Resources (jobs, pipelines, dashboards, monitoring): `databricks_linkedin_analytics/resources/*.yml`

@@ -18,12 +18,14 @@ Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yz
 - For breaking schema changes, plan a backfill run and document how to re-run the gold pipeline for affected partitions
 
 ## Testing and CI
-- Use `papermill` to parameterize and run key notebooks in CI
-- Add small unit tests for any Python modules using `pytest`
+- Use `pytest` for unit testing Python modules (run via `uv run pytest`).
+- Tests run locally using mocks for PySpark, bypassing Databricks Connect restrictions.
+- A CI/CD workflow validates bundle syntax and runs unit tests on every PR.
 
 ## Refactoring tips
-- Move commonly-reused functions (parsing, date helpers) from notebooks into a `src/` Python module
-- Keep notebooks lightweight and use `%run` or module imports for shared code
+- Move commonly-reused functions from notebooks into `src/linkedin_analytics_jobs/utils/` (e.g., `pipeline_utils.py`) or `src/excel_ingestion_app/utils/` (e.g., `excel_validator.py`).
+- Use absolute imports in notebooks after adding the `utils` path to `sys.path`.
+- Ensure utility functions are generic and accept/infer the Spark session to stay testable.
 
 ## Configuration
 - Bundle and resource definitions live in `databricks_linkedin_analytics/databricks.yml` and `databricks_linkedin_analytics/resources/*.yml`.
