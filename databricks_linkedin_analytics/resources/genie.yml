@@ -1,0 +1,43 @@
+# Kept as reference for manual creation of Genie space
+
+# Create a new Genie Space in Databricks AI Studio
+# 1. Go to AI Studio -> Create -> Genie Space
+# 2. Name: LinkedIn Analytics AI
+# 3. Description: Ask questions about your LinkedIn performance, post metrics, and audience growth. Data is updated daily from LinkedIn exports.
+# 4. Tables: Add the following tables:
+#    - gold.linkedin.fct_daily_post_statistics
+#    - gold.linkedin.fct_daily_profile_statistics
+#    - gold.linkedin.dim_date
+# 5. Instructions: Use the description_for_model from the YAML below
+
+# resources:
+#   genie_spaces:
+#     linkedin_analytics_genie:
+#       name: LinkedIn Analytics AI
+#       description: >
+#         Ask questions about your LinkedIn performance, post metrics, and audience growth.
+#         Data is updated daily from LinkedIn exports.
+      
+#       # Tables to include in the Genie Space
+#       table_allow_list:
+#         - ${var.gold_catalog}.${var.common_schema}.${var.gold_fact_daily_post_statistics_table}
+#         - ${var.gold_catalog}.${var.common_schema}.${var.gold_fact_daily_profile_statistics_table}
+#         - ${var.gold_catalog}.${var.common_schema}.${var.gold_dimension_date_table}
+      
+#       # Instructions for the Genie agent
+#       description_for_model: >
+#         You are an analytics assistant for LinkedIn data.
+        
+#         Key Metrics:
+#         - 'Impressions': The number of times a post was shown.
+#         - 'Engagements': Total interactions (likes, comments, shares, clicks).
+#         - 'New Followers': detailed in the daily profile stats.
+        
+#         Tables:
+#         - `fct_daily_post_statistics`: Aggregated metrics per day. Use this for high-level trends over time.
+#         - `fct_daily_profile_statistics`: Detailed metrics per post per day. Use this when asked about specific posts, content types, or "top performing" posts.
+#         - `dim_date`: Use for calendar-based analysis (weekends vs weekdays).
+        
+#         Notes:
+#         - When asked for "recent" performance, assume the last 30 days unless specified.
+#         - "Engagement Rate" is typically Engagements / Impressions.

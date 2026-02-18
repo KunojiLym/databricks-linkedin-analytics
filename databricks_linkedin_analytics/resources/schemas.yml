@@ -4,6 +4,10 @@ resources:
       catalog_name: ${var.landing_catalog}
       comment: LinkedIn landing schema created by DAB
       name: ${var.common_schema}
+      grants:
+        - principal: ${resources.apps.excel_ingestion_app.service_principal_client_id}
+          privileges:
+            - USE_SCHEMA
     bronze:
       catalog_name: ${var.bronze_catalog}
       comment: LinkedIn bronze schema created by DAB
@@ -21,6 +25,11 @@ resources:
       catalog_name: ${var.landing_catalog}
       schema_name: ${resources.schemas.landing.name}
       name: ${var.landing_content_daily_volume}
+      grants:
+        - principal: ${resources.apps.excel_ingestion_app.service_principal_client_id}
+          privileges:
+            - READ_VOLUME
+            - WRITE_VOLUME
     content_historical:
       catalog_name: ${var.landing_catalog}
       schema_name: ${resources.schemas.landing.name}

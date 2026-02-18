@@ -1,0 +1,28 @@
+resources:
+  apps:
+    excel_ingestion_app:
+      name: excel-ingestion-app
+      description: Streamlit app for ingesting Excel files into LinkedIn Analytics pipeline
+      source_code_path: ../src/excel_ingestion_app
+      resources:
+        - name: landing_volume
+          uc_securable:
+            securable_type: VOLUME
+            securable_full_name: ${var.landing_catalog}.${resources.schemas.landing.name}.${var.landing_content_daily_volume}
+            permission: WRITE_VOLUME
+        - name: landing_volume_read
+          uc_securable:
+            securable_type: VOLUME
+            securable_full_name: ${var.landing_catalog}.${resources.schemas.landing.name}.${var.landing_content_daily_volume}
+            permission: READ_VOLUME
+      config:
+        command: [streamlit, run, app.py]
+        env:
+          - name: LANDING_CATALOG
+            value: ${var.landing_catalog}
+          - name: LANDING_SCHEMA
+            value: ${resources.schemas.landing.name}
+          - name: LANDING_VOLUME
+            value: ${var.landing_content_daily_volume}
+          - name: INGESTION_FOLDER
+            value: ${var.ingestion_folder}
