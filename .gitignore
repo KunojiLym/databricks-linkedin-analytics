@@ -229,3 +229,4 @@ __marimo__/
 #  be found at https://github.com/github/gitignore/blob/main/Global/IntelliJ.gitignore
 
 .idea/
+uv.lock

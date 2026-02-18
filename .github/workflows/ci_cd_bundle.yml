@@ -1,0 +1,67 @@
+
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  validate_and_test:
+    runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Validate Bundle
+        if: env.DATABRICKS_TOKEN != ''
+        run: databricks bundle validate
+        working-directory: databricks_linkedin_analytics
+
+      - name: Run Unit Tests
+        run: |
+          cd databricks_linkedin_analytics
+          uv run pytest tests/unit
+
+  deploy_dev:
+    needs: validate_and_test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Databricks CLI
+        uses: databricks/setup-cli@main
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Deploy to Dev
+        if: env.DATABRICKS_TOKEN != ''
+        run: databricks bundle deploy --target dev
+        working-directory: databricks_linkedin_analytics
+
+      - name: Deploy App to Dev
+        if: env.DATABRICKS_TOKEN != ''
+        run: databricks bundle run --target dev excel_ingestion_app
+        working-directory: databricks_linkedin_analytics

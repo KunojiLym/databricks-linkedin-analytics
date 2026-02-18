@@ -8,12 +8,34 @@ variables:
     description: The ID of the Databricks SQL warehouse cluster
   pipeline_runner:
     description: The name of the service principal used to deploy the DAB and run the pipelines
+    default: ${workspace.current_user.userName} 
+    # Value for local development should be provided in .databricks/bundle/dev/variable-overrides.json (git-ignored)
+
+  excel_ingestion_app_sp_id:
+    description: The Application ID of the service principal for the Excel Ingestion App (used for grants)
+    default: "" # Should be provided in variable-overrides.json
+  
+  # OAuth settings for Service Principal
+  client_id:
+    description: The client ID of the service principal
+    default: ""
+  client_secret:
+    description: The client secret of the service principal (use with caution)
+    default: ""
+
+  current_user_email:
+    description: The email of the user deploying the bundle (used for folder paths and notifications)
+    default: ${workspace.current_user.userName}
+    # Value for local development should be provided in .databricks/bundle/dev/variable-overrides.json (git-ignored)
+
   support_email:
     description: The support email for notifications
-    default: ${workspace.current_user.email}
+    default: ${var.current_user_email}
+    # Value for local development should be provided in .databricks/bundle/dev/variable-overrides.json (git-ignored)
   monitoring_folder:
     description: The folder in the Databricks workspace for storing quality monitoring dashboards
-    default: /Workspace/Users/${workspace.current_user.email}/databricks_lakehouse_monitoring
+    default: /Workspace/Users/${var.current_user_email}/databricks_lakehouse_monitoring
+    # Value for local development should be provided in .databricks/bundle/dev/variable-overrides.json (git-ignored)
 
   # 1. Settings for the medallion layer catalogs and schemas
   landing_catalog: 
@@ -117,7 +139,7 @@ variables:
     description: The ID of the gold dimension table/view for timestamps
     default: dim_timestamp
 
-  # 5. Settings for the dashboard
   dashboard_subscriber:
     description: The email of the subscriber to the dashboard
-    default: ${workspace.current_user.userName}
+    default: ${var.current_user_email}
+    # Value for local development should be provided in .databricks/bundle/dev/variable-overrides.json (git-ignored)

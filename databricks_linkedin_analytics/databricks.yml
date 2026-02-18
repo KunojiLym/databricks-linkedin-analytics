@@ -17,17 +17,17 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://dbc-f9790a9f-76d6.cloud.databricks.com
+      host: ${workspace.host}
   prod:
     mode: production
     workspace:
-      host: https://dbc-f9790a9f-76d6.cloud.databricks.com
+      host: ${workspace.host}
       # We explicitly deploy to /Workspace/Users/<current user> to make sure we only have a single copy in the workspace.
-      root_path: /Workspace/Users/${workspace.current_user.email}/.bundle/${bundle.name}/${bundle.target}
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     run_as:
       service_principal_name: ${var.pipeline_runner}
     variables:
-      dashboard_subscriber: ${workspace.current_user.userName}
+      dashboard_subscriber: ${var.dashboard_subscriber}
     # permissions:
     #   - user_name: <replace with your own user name>
     #     level: CAN_MANAGE
