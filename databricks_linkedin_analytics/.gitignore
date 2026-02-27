@@ -1,4 +1,4 @@
-.databricks/
+.databricks/bundle/*/variable-overrides.json
 build/
 dist/
 __pycache__/

@@ -28,8 +28,8 @@ resources:
       serverless: true
       root_path: ../src/linkedin_analytics_jobs/3. gold modelling/
       notifications:
-        alerts:
-          - on-update-fatal-failure
-          - on-flow-failure
-        email_recipients:
-          - ${var.support_email}
+        - email_recipients:
+            - ${var.support_email}
+          alerts:
+            - on-update-fatal-failure
+            - on-flow-failure

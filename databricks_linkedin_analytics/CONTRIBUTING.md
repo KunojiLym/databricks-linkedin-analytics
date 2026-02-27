@@ -23,10 +23,11 @@ PR checklist (required before merging)
   - [ ] Large code blocks were not copy-pasted into docs (if included, ensure they are <= 5 lines)
   - [ ] Local dev overrides (e.g., `.databricks/bundle/*/variable-overrides.json`) do not contain secrets; use Databricks secrets or CI secrets for tokens. See `docs/quickstart.md` for examples.
 
-Testing guidance
-- Unit tests: run `pytest` (if tests are added)
-- Notebook smoke test: use `papermill` to run critical notebooks with small parameters
-- Validate YAML files with a YAML linter or `yamllint`
+Testing and CI/CD for Maintainers
+- **Unit tests**: run `uv run pytest tests/unit` locally. These are mocked and require no Databricks connection.
+- **CI in your Fork**: For full bundle validation in your own fork, add `DATABRICKS_HOST` and `DATABRICKS_TOKEN` to your **Fork's Repository Secrets**.
+- **External PRs**: CI will run unit tests for all PRs. However, `bundle validate` and `deploy` steps will skip on external PRs due to GitHub security restrictions on secrets access from forks.
+- **Local Validation**: Always run `databricks bundle validate` locally before submitting a PR.
 
 Security
 - Do not commit credentials. Use environment variables or secret stores when running jobs.

@@ -2,7 +2,7 @@ resources:
   quality_monitors:
     bronze_profile_metrics:
       table_name: ${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_profile_metrics_table}
-      output_schema_name: ${resources.schemas.bronze.name}
+      output_schema_name: ${var.bronze_catalog}.${resources.schemas.bronze.name}
       assets_dir: ${var.monitoring_folder}/${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_profile_metrics_table}
       time_series:
         granularities: ["1 day"]
@@ -17,7 +17,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     bronze_profile_followers:
       table_name: ${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_profile_followers_table}
-      output_schema_name: ${resources.schemas.bronze.name}
+      output_schema_name: ${var.bronze_catalog}.${resources.schemas.bronze.name}
       assets_dir: ${var.monitoring_folder}/${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_profile_followers_table}
       time_series:
         granularities: ["1 day"]
@@ -32,7 +32,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     bronze_post_metrics:
       table_name: ${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_post_metrics_table}
-      output_schema_name: ${resources.schemas.bronze.name}
+      output_schema_name: ${var.bronze_catalog}.${resources.schemas.bronze.name}
       assets_dir: ${var.monitoring_folder}/${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_post_metrics_table}
       time_series:
         granularities: ["1 day"]
@@ -47,7 +47,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     bronze_post_metadata:
       table_name: ${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_post_metadata_table}
-      output_schema_name: ${resources.schemas.bronze.name}
+      output_schema_name: ${var.bronze_catalog}.${resources.schemas.bronze.name}
       assets_dir: ${var.monitoring_folder}/${var.bronze_catalog}.${resources.schemas.bronze.name}.${var.bronze_post_metadata_table}
       time_series:
         granularities: ["1 day"]
@@ -62,7 +62,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     silver_profile_metrics:
       table_name: ${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_profile_metrics}
-      output_schema_name: ${resources.schemas.silver.name}
+      output_schema_name: ${var.silver_catalog}.${resources.schemas.silver.name}
       assets_dir: ${var.monitoring_folder}/${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_profile_metrics}
       time_series:
         granularities: ["1 day"]
@@ -77,7 +77,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     silver_profile_followers:
       table_name: ${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_profile_followers}
-      output_schema_name: ${resources.schemas.silver.name}
+      output_schema_name: ${var.silver_catalog}.${resources.schemas.silver.name}
       assets_dir: ${var.monitoring_folder}/${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_profile_followers}
       time_series:
         granularities: ["1 day"]
@@ -92,7 +92,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     silver_post_impressions:
       table_name: ${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_post_impressions}
-      output_schema_name: ${resources.schemas.silver.name}
+      output_schema_name: ${var.silver_catalog}.${resources.schemas.silver.name}
       assets_dir: ${var.monitoring_folder}/${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_post_impressions}
       time_series:
         granularities: ["1 day"]
@@ -107,7 +107,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     silver_post_engagements:
       table_name: ${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_post_engagements}
-      output_schema_name: ${resources.schemas.silver.name}
+      output_schema_name: ${var.silver_catalog}.${resources.schemas.silver.name}
       assets_dir: ${var.monitoring_folder}/${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_post_engagements}
       time_series:
         granularities: ["1 day"]
@@ -122,7 +122,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     silver_post_metadata:
       table_name: ${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_post_metadata}
-      output_schema_name: ${resources.schemas.silver.name}
+      output_schema_name: ${var.silver_catalog}.${resources.schemas.silver.name}
       assets_dir: ${var.monitoring_folder}/${var.silver_catalog}.${resources.schemas.silver.name}.${var.silver_post_metadata}
       time_series:
         granularities: ["1 day"]
@@ -137,7 +137,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     gold_fct_daily_profile_statistics:
       table_name: ${var.gold_catalog}.${resources.schemas.gold.name}.${var.gold_fact_daily_profile_statistics_table}
-      output_schema_name: ${resources.schemas.gold.name}
+      output_schema_name: ${var.gold_catalog}.${resources.schemas.gold.name}
       assets_dir: ${var.monitoring_folder}/${var.gold_catalog}.${resources.schemas.gold.name}.${var.gold_fact_daily_profile_statistics_table}
       time_series:
         granularities: ["1 day"]
@@ -152,7 +152,7 @@ resources:
       warehouse_id: ${var.warehouse_id}
     gold_fct_daily_post_statistics:
       table_name: ${var.gold_catalog}.${resources.schemas.gold.name}.${var.gold_fact_daily_post_statistics_table}
-      output_schema_name: ${resources.schemas.gold.name}
+      output_schema_name: ${var.gold_catalog}.${resources.schemas.gold.name}
       assets_dir: ${var.monitoring_folder}/${var.gold_catalog}.${resources.schemas.gold.name}.${var.gold_fact_daily_post_statistics_table}
       time_series:
         granularities: ["1 day"]

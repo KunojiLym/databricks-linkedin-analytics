@@ -7,13 +7,10 @@ How to use this file
 - When a PR completes a task, mark the checkbox and add a short changelog entry in `CHANGELOG.md`.
 
 High priority
-- [ ] Add CI smoke tests to run critical notebooks via `papermill` on PRs. (Files: `docs/quickstart.md`, critical notebooks under `src/linkedin_analytics_jobs/`)
-- [ ] Add a minimal GitHub Actions workflow to run the smoke tests and validate YAML syntax (e.g., `yamllint`). (Create: `.github/workflows/smoke-test.yml`)
-- [ ] Add short `papermill` parameterized smoke notebooks and a test harness that runs them with tiny input sets. (Suggested location: `tests/notebook_smoke_tests/`)
-- [ ] Add a README badge for docs/CI status and add to top-level README.
+- [x] Integrate Unit Testing and Bundle Validation into CI/CD. (Implemented: `.github/workflows/ci_cd_bundle.yml`)
 
 Medium priority
-- [ ] Add short unit tests for any Python modules in `src/` using `pytest` and add test runner instructions.
+- [x] Add short unit tests for any Python modules in `src/` using `pytest` and add test runner instructions.
 - [ ] Add lightweight architecture diagrams to `docs/images/` (SVG) and embed them in `docs/README.md`.
 - [ ] Create `docs/diagrams.svg` or `docs/images/architecture.svg` for the medallion flow.
 - [ ] Add small sample dataset files (anonymized) to `tests/fixtures/` for faster local iteration.
@@ -27,7 +24,7 @@ Orchestration and operations
 - [ ] Add minimal monitoring SQL examples in `docs/observability.md` (daily freshness checks and row-count anomaly checks).
 
 Maintainability
-- [ ] Extract frequently used notebook code into `src/` Python modules and add import examples in notebooks.
+- [x] Extract frequently used notebook code into `src/` Python modules and add import examples in notebooks.
 - [ ] Add a short migration note template in `docs/maintainability.md` to document schema changes and backfill plans.
 
 Documentation hygiene
@@ -37,6 +34,7 @@ Documentation hygiene
 Nice-to-have (lower priority)
 - [ ] Add an MkDocs configuration `mkdocs.yml` and a simple theme if you want a docs site.
 - [ ] Add a small dashboard health badge (if you have a monitoring endpoint) to the README.
+- [ ] **[Low Priority]** Add CI smoke tests/integration tests for critical notebooks via `papermill`. *Note: Partially superseded by modular unit tests and `bundle validate`.*
 
 How to mark progress
 - When completing a task: mark the checkbox, open a PR, and add a brief `CHANGELOG.md` entry under the latest dated section (one-liner).

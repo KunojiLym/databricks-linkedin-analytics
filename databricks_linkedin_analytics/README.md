@@ -53,6 +53,22 @@ with this project. It's also possible to interact with it directly using the CLI
    $ databricks bundle run
    ```
 
+## Testing
+
+This project uses `pytest` for unit testing Python modules and utilities. Tests are designed to run locally without requiring an active Databricks connection by using mocks for Spark operations.
+
+1.  **Install dependencies**:
+    ```bash
+    uv sync
+    ```
+
+2.  **Run tests**:
+    ```bash
+    uv run pytest
+    ```
+
+Unit tests cover filename validation, Excel sheet validation, and pipeline utilities (security and time-series logic).
+
 ## Documentation
 
 This repository's documentation is intentionally concise and organized for quick navigation without needing the original blog posts. The docs are high-level—implementation details live in the code (notebooks, SQL, and YAML) so that documentation stays stable and low-effort to maintain.
