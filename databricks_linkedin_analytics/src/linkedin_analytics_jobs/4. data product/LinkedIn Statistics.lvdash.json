@@ -343,6 +343,58 @@
             }
           }
         }
+      ],
+      "columns": [
+        {
+          "displayName": "Aggregated Total Impressions",
+          "description": "",
+          "expression": "SUM(impressions)"
+        },
+        {
+          "displayName": "Aggregated Total Engagements",
+          "description": "",
+          "expression": "SUM(engagements)"
+        },
+        {
+          "displayName": "Aggregated Engagement Rate",
+          "description": "",
+          "expression": "SUM(engagements) / SUM(impressions)"
+        },
+        {
+          "displayName": "Max Impressions Over Aggregate",
+          "description": "",
+          "expression": "MAX(impressions)"
+        },
+        {
+          "displayName": "Max Engagements Over Aggregate",
+          "description": "",
+          "expression": "MAX(engagements)"
+        },
+        {
+          "displayName": "Aggregate Count of Posts with Impressions",
+          "description": "",
+          "expression": "COUNT(DISTINCT post_id)"
+        },
+        {
+          "displayName": "Aggregate Count of Posts Published",
+          "description": "",
+          "expression": "COUNT(\r\n    DISTINCT CASE \r\n    WHEN analytics_date = post_publish_date \r\n    THEN post_id\r\n    END\r\n)"
+        },
+        {
+          "displayName": "Day 0 Impressions",
+          "description": "",
+          "expression": "SUM(CASE \r\n    WHEN analytics_date = post_publish_date\r\n    THEN impressions\r\n    END\r\n)"
+        },
+        {
+          "displayName": "Ranked Days After Post by Engagement Rate",
+          "description": "",
+          "expression": "rank() OVER (\r\n    PARTITION BY post_id\r\n    ORDER BY (sum(impressions) / sum(engagements)) DESC\r\n)"
+        },
+        {
+          "displayName": "Days After Post",
+          "description": "",
+          "expression": "rank() OVER (\r\n    PARTITION BY post_id\r\n    ORDER BY analytics_date ASC\r\n) - 1"
+        }
       ]
     }
   ],
@@ -437,9 +489,9 @@
             }
           },
           "position": {
-            "x": 3,
+            "x": 6,
             "y": 3,
-            "width": 3,
+            "width": 6,
             "height": 6
           }
         },
@@ -532,7 +584,7 @@
           "position": {
             "x": 0,
             "y": 3,
-            "width": 3,
+            "width": 6,
             "height": 6
           }
         },
@@ -610,7 +662,7 @@
           "position": {
             "x": 0,
             "y": 10,
-            "width": 6,
+            "width": 12,
             "height": 7
           }
         },
@@ -619,7 +671,7 @@
             "name": "8d23863c",
             "queries": [
               {
-                "name": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_days_since_post",
+                "name": "dashboards/01f0cde3d3cc1823b4c1f4feb5e3d770/datasets/01f10f98c3ca19e099896de7f268e4b6_days_since_post",
                 "query": {
                   "datasetName": "2df03904",
                   "fields": [
@@ -638,25 +690,38 @@
             ],
             "spec": {
               "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Days since post"
+              },
+              "selection": {
+                "defaultSelection": {
+                  "range": {
+                    "dataType": "INTEGER",
+                    "min": {
+                      "value": ""
+                    },
+                    "max": {
+                      "value": "7"
+                    }
+                  }
+                }
+              },
               "widgetType": "range-slider",
               "encodings": {
                 "fields": [
                   {
                     "fieldName": "days_since_post",
-                    "queryName": "dashboards/01f0c2204d911ea4b0f64dacde266fc8/datasets/01f0c22d8ab2189aafade7e9091f045a_days_since_post"
+                    "queryName": "dashboards/01f0cde3d3cc1823b4c1f4feb5e3d770/datasets/01f10f98c3ca19e099896de7f268e4b6_days_since_post"
                   }
                 ]
-              },
-              "frame": {
-                "showTitle": true,
-                "title": "Days since post"
               }
             }
           },
           "position": {
             "x": 0,
             "y": 9,
-            "width": 3,
+            "width": 6,
             "height": 1
           }
         },
@@ -736,7 +801,7 @@
           "position": {
             "x": 0,
             "y": 0,
-            "width": 3,
+            "width": 6,
             "height": 1
           }
         },
@@ -782,7 +847,7 @@
           "position": {
             "x": 0,
             "y": 1,
-            "width": 3,
+            "width": 4,
             "height": 2
           }
         },
@@ -826,14 +891,61 @@
             }
           },
           "position": {
-            "x": 3,
+            "x": 4,
             "y": 1,
-            "width": 3,
+            "width": 4,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "4a51b1e4",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "measure(Aggregated Engagement Rate)",
+                      "expression": "MEASURE(`Aggregated Engagement Rate`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Average engagement rate"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(Aggregated Engagement Rate)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 1,
+            "width": 4,
             "height": 2
           }
         }
       ],
-      "pageType": "PAGE_TYPE_CANVAS"
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
     },
     {
       "name": "180e9a6d",
@@ -975,7 +1087,7 @@
           "position": {
             "x": 0,
             "y": 0,
-            "width": 3,
+            "width": 6,
             "height": 1
           }
         },
@@ -1007,6 +1119,10 @@
             ],
             "spec": {
               "version": 1,
+              "frame": {
+                "showTitle": true,
+                "title": "Post performance"
+              },
               "widgetType": "combo",
               "encodings": {
                 "x": {
@@ -1024,6 +1140,12 @@
                     "position": "bottom"
                   }
                 },
+                "label": {
+                  "show": true,
+                  "display": {
+                    "type": "y-max"
+                  }
+                },
                 "y": {
                   "primary": {
                     "fields": [
@@ -1035,7 +1157,9 @@
                       "type": "quantitative"
                     },
                     "axis": {
-                      "hideGrid": true
+                      "hideGrid": true,
+                      "hideTitle": true,
+                      "hideLabels": true
                     }
                   },
                   "secondary": {
@@ -1048,23 +1172,27 @@
                       "type": "quantitative"
                     },
                     "axis": {
-                      "hideTitle": false,
+                      "hideTitle": true,
                       "hideGrid": true,
-                      "hideLabels": false
+                      "hideLabels": true
+                    },
+                    "format": {
+                      "type": "number-plain",
+                      "abbreviation": "compact",
+                      "decimalPlaces": {
+                        "type": "max",
+                        "places": 2
+                      }
                     }
                   }
                 }
-              },
-              "frame": {
-                "showTitle": true,
-                "title": "Historical post performance"
               }
             }
           },
           "position": {
             "x": 0,
             "y": 1,
-            "width": 6,
+            "width": 12,
             "height": 4
           }
         },
@@ -1096,6 +1224,10 @@
             ],
             "spec": {
               "version": 1,
+              "frame": {
+                "showTitle": true,
+                "title": "Post performance filtered by days since post"
+              },
               "widgetType": "combo",
               "encodings": {
                 "x": {
@@ -1125,7 +1257,9 @@
                       "type": "quantitative"
                     },
                     "axis": {
-                      "hideGrid": true
+                      "hideGrid": true,
+                      "hideTitle": true,
+                      "hideLabels": true
                     }
                   },
                   "secondary": {
@@ -1138,23 +1272,25 @@
                       "type": "quantitative"
                     },
                     "axis": {
-                      "hideTitle": false,
+                      "hideTitle": true,
                       "hideGrid": true,
-                      "hideLabels": false
+                      "hideLabels": true
                     }
                   }
+                },
+                "label": {
+                  "show": true,
+                  "display": {
+                    "type": "y-min-and-max"
+                  }
                 }
-              },
-              "frame": {
-                "showTitle": true,
-                "title": "Post performance filtered by days since post"
               }
             }
           },
           "position": {
             "x": 0,
             "y": 8,
-            "width": 2,
+            "width": 4,
             "height": 9
           }
         },
@@ -1213,7 +1349,7 @@
           "position": {
             "x": 0,
             "y": 5,
-            "width": 2,
+            "width": 4,
             "height": 1
           }
         },
@@ -1704,9 +1840,9 @@
             }
           },
           "position": {
-            "x": 2,
+            "x": 4,
             "y": 5,
-            "width": 4,
+            "width": 8,
             "height": 2
           }
         },
@@ -1734,474 +1870,41 @@
               }
             ],
             "spec": {
-              "version": 1,
+              "version": 2,
+              "frame": {
+                "showTitle": false,
+                "title": "Post metadata"
+              },
+              "rowsPerPage": 25,
+              "displayRowNumbers": false,
+              "freezeUpToColumnNumber": 0,
               "widgetType": "table",
               "encodings": {
                 "columns": [
                   {
                     "fieldName": "content",
-                    "booleanValues": [
-                      "false",
-                      "true"
-                    ],
-                    "imageUrlTemplate": "{{ @ }}",
-                    "imageTitleTemplate": "{{ @ }}",
-                    "imageWidth": "",
-                    "imageHeight": "",
-                    "linkUrlTemplate": "{{ @ }}",
-                    "linkTextTemplate": "{{ @ }}",
-                    "linkTitleTemplate": "{{ @ }}",
-                    "linkOpenInNewTab": true,
-                    "type": "string",
-                    "displayAs": "string",
-                    "visible": true,
-                    "order": 100016,
-                    "title": "content",
-                    "allowSearch": false,
-                    "alignContent": "left",
-                    "allowHTML": false,
-                    "highlightLinks": false,
-                    "useMonospaceFont": false,
-                    "preserveWhitespace": false,
-                    "cellFormat": {
-                      "default": {
-                        "foregroundColor": null
-                      },
-                      "rules": []
+                    "useForSearch": false,
+                    "contentAlignment": "left",
+                    "columnWidth": 1000,
+                    "actions": {
+                      "hover": {
+                        "type": "tooltip",
+                        "tooltipTemplate": "{{ @ }}"
+                      }
+                    },
+                    "style": {
+                      "type": "image",
+                      "urlTemplate": "{{ @ }}"
                     }
                   }
                 ]
-              },
-              "invisibleColumns": [
-                {
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "post_id",
-                  "type": "string",
-                  "displayAs": "string",
-                  "order": 100000,
-                  "title": "post_id",
-                  "allowSearch": false,
-                  "alignContent": "left",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "dateTimeFormat": "DD/MM/YYYY",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "post_publish_date",
-                  "type": "date",
-                  "displayAs": "datetime",
-                  "order": 100001,
-                  "title": "post_publish_date",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "dateTimeFormat": "DD/MM/YYYY HH:mm:ss.SSS",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "post_publish_timestamp",
-                  "type": "datetime",
-                  "displayAs": "datetime",
-                  "order": 100002,
-                  "title": "post_publish_timestamp",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "impressions",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100003,
-                  "title": "impressions",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "engagements",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100004,
-                  "title": "engagements",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "dateTimeFormat": "DD/MM/YYYY",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "analytics_date",
-                  "type": "date",
-                  "displayAs": "datetime",
-                  "order": 100005,
-                  "title": "analytics_date",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "analytics_day",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100006,
-                  "title": "analytics_day",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "analytics_month",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100007,
-                  "title": "analytics_month",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "analytics_year",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100008,
-                  "title": "analytics_year",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "analytics_week",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100009,
-                  "title": "analytics_week",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "analytics_weekday",
-                  "type": "string",
-                  "displayAs": "string",
-                  "order": 100010,
-                  "title": "weekday",
-                  "allowSearch": false,
-                  "alignContent": "left",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "analytics_is_weekend",
-                  "type": "boolean",
-                  "displayAs": "boolean",
-                  "order": 100011,
-                  "title": "analytics_is_weekend",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "days_since_post",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100012,
-                  "title": "days_since_post",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "change_in_impressions",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100013,
-                  "title": "change_in_impressions",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "numberFormat": "0",
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "change_in_engagements",
-                  "type": "integer",
-                  "displayAs": "number",
-                  "order": 100014,
-                  "title": "change_in_engagements",
-                  "allowSearch": false,
-                  "alignContent": "right",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                },
-                {
-                  "booleanValues": [
-                    "false",
-                    "true"
-                  ],
-                  "imageUrlTemplate": "{{ @ }}",
-                  "imageTitleTemplate": "{{ @ }}",
-                  "imageWidth": "",
-                  "imageHeight": "",
-                  "linkUrlTemplate": "{{ @ }}",
-                  "linkTextTemplate": "{{ @ }}",
-                  "linkTitleTemplate": "{{ @ }}",
-                  "linkOpenInNewTab": true,
-                  "name": "title",
-                  "type": "string",
-                  "displayAs": "string",
-                  "order": 100015,
-                  "title": "title",
-                  "allowSearch": false,
-                  "alignContent": "left",
-                  "allowHTML": false,
-                  "highlightLinks": false,
-                  "useMonospaceFont": false,
-                  "preserveWhitespace": false
-                }
-              ],
-              "allowHTMLByDefault": false,
-              "itemsPerPage": 25,
-              "paginationSize": "default",
-              "condensed": true,
-              "withRowNumber": false,
-              "firstNFrozenColumns": 0,
-              "frame": {
-                "showTitle": false,
-                "title": "Post metadata"
               }
             }
           },
           "position": {
-            "x": 2,
+            "x": 4,
             "y": 7,
-            "width": 4,
+            "width": 8,
             "height": 10
           }
         },
@@ -2212,11 +1915,11 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "c2b17097",
+                  "datasetName": "2df03904",
                   "fields": [
                     {
-                      "name": "sum(impressions)",
-                      "expression": "SUM(`impressions`)"
+                      "name": "measure(Day 0 Impressions)",
+                      "expression": "MEASURE(`Day 0 Impressions`)"
                     }
                   ],
                   "disaggregated": false
@@ -2225,22 +1928,22 @@
             ],
             "spec": {
               "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Day 0 impressions"
+              },
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "sum(impressions)"
+                  "fieldName": "measure(Day 0 Impressions)"
                 }
-              },
-              "frame": {
-                "showTitle": true,
-                "title": "Total impressions"
               }
             }
           },
           "position": {
-            "x": 3,
+            "x": 6,
             "y": 0,
-            "width": 1,
+            "width": 2,
             "height": 1
           }
         },
@@ -2251,11 +1954,16 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "c2b17097",
+                  "datasetName": "2df03904",
                   "fields": [
                     {
-                      "name": "sum(engagements)",
-                      "expression": "SUM(`engagements`)"
+                      "name": "measure(Aggregated Engagement Rate)",
+                      "expression": "MEASURE(`Aggregated Engagement Rate`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`Ranked Days After Post by Engagement Rate` IN (`Ranked Days After Post by Engagement Rate`) OR TRUE"
                     }
                   ],
                   "disaggregated": false
@@ -2264,22 +1972,29 @@
             ],
             "spec": {
               "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Peak engagement rate"
+              },
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "sum(engagements)"
+                  "fieldName": "measure(Aggregated Engagement Rate)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
                 }
-              },
-              "frame": {
-                "showTitle": true,
-                "title": "Total engagements"
               }
             }
           },
           "position": {
-            "x": 4,
+            "x": 8,
             "y": 0,
-            "width": 2,
+            "width": 4,
             "height": 1
           }
         },
@@ -2318,7 +2033,7 @@
           "position": {
             "x": 0,
             "y": 6,
-            "width": 1,
+            "width": 2,
             "height": 2
           }
         },
@@ -2355,14 +2070,90 @@
             }
           },
           "position": {
-            "x": 1,
+            "x": 2,
             "y": 6,
-            "width": 1,
+            "width": 2,
             "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "0c9bb4e6",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "2df03904",
+                  "fields": [
+                    {
+                      "name": "analytics_date",
+                      "expression": "`analytics_date`"
+                    },
+                    {
+                      "name": "measure(Aggregated Engagement Rate)",
+                      "expression": "MEASURE(`Aggregated Engagement Rate`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Post performance"
+              },
+              "widgetType": "line",
+              "encodings": {
+                "x": {
+                  "fieldName": "analytics_date",
+                  "axis": {
+                    "hideTitle": true,
+                    "hideGrid": true,
+                    "hideLabels": false
+                  },
+                  "scale": {
+                    "type": "temporal"
+                  }
+                },
+                "y": {
+                  "fieldName": "measure(Aggregated Engagement Rate)",
+                  "axis": {
+                    "hideTitle": true,
+                    "hideLabels": true,
+                    "hideGrid": true
+                  },
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  },
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "label": {
+                  "show": true,
+                  "display": {
+                    "type": "y-max"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 12,
+            "height": 4
           }
         }
       ],
-      "pageType": "PAGE_TYPE_CANVAS"
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
     },
     {
       "name": "3982d302",
@@ -2940,9 +2731,9 @@
             }
           },
           "position": {
-            "x": 0,
+            "x": 2,
             "y": 0,
-            "width": 6,
+            "width": 10,
             "height": 3
           }
         },
@@ -3024,7 +2815,7 @@
           "position": {
             "x": 0,
             "y": 4,
-            "width": 6,
+            "width": 12,
             "height": 13
           }
         },
@@ -3083,12 +2874,40 @@
           "position": {
             "x": 0,
             "y": 3,
-            "width": 3,
+            "width": 6,
             "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "72c7366b",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "bea9d2f0",
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": []
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 2,
+            "height": 3
           }
         }
       ],
-      "pageType": "PAGE_TYPE_CANVAS"
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
     },
     {
       "name": "eda36a50",
