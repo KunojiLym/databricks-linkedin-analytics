@@ -16,6 +16,28 @@ This project ingests LinkedIn profile and content metrics exported as Excel/CSV 
 - Landing files are expected in the `content_daily`, `historical_daily`, `posts`, and `patch` volumes (see `variables.yml` defaults)
 - Bronze tables are named via variables in `resources/variables.yml` (e.g., `bronze_profile_metrics_table`, `bronze_post_metrics_table`)
 
+### Daily and historical content exports
+
+Both formats use the same sheets (`DISCOVERY`, `ENGAGEMENT`, `FOLLOWERS`, `TOP POSTS`):
+
+| Format | Filename pattern | Profile name in filename |
+|--------|------------------|--------------------------|
+| **Current** | `AggregateAnalytics_{Profile}_{from}_{to}.xlsx` | Title Case with spaces, e.g. `Your Profile Name Here` |
+| **Legacy** | `Content_{from}_{to}_{Profile}.xlsx` | camelCase, no spaces, e.g. `YourProfileNameHere` |
+
+Daily ingest requires matching from/to dates. Historical ingest allows different from/to dates.
+
+Configure `linkedin_profile_name` in bundle variable overrides to your LinkedIn display name. Either spaced (`Your Profile Name Here`) or compact (`YourProfileNameHere`) works; the pipeline normalizes both to the correct filename variants.
+
+### Per-post analytics exports
+
+| Format | Filename pattern | Sheets |
+|--------|------------------|--------|
+| **Current** | `SinglePostAnalytics_{Profile}_{post_id}.xlsx` | `Post analytics` (performance key/values + demographics table) |
+| **Legacy** | `PostAnalytics_{ProfileNoSpaces}_{post_id}.xlsx` | `PERFORMANCE`, `TOP DEMOGRAPHICS` |
+
+**Caveat (new post format):** LinkedIn no longer includes a `... Highlights {start} to {end}` analytics date range. For `SinglePostAnalytics` files, `analytics_date` in `bronze.linkedin.post_details` is set to the **ingestion run date** (UTC). This approximates the snapshot day at ingest time; re-ingesting the same file on a later day creates a new `(post_url, analytics_date)` row. File modification and upload timestamps are not reliable on Databricks volumes.
+
 ## Sample shapes and notes
 - Profile daily totals: expected numeric columns for impressions, engagements, followers
 - Per-post metrics: post id, timestamp, impressions, likes, comments, shares

@@ -4,6 +4,26 @@ All notable changes to this repository will be documented in this file.
 
 Format follows a simple dated "YYYY-MM-DD" style. Add a dated section when changes are merged; use `Unreleased` only if you later adopt a formal release workflow.
 
+## [2026-06-20]
+
+### Added
+- **Dual-format LinkedIn Excel ingestion**: Support for current `AggregateAnalytics_{Profile}_{date}_{date}.xlsx` alongside legacy `Content_{date}_{date}_{Profile}.xlsx` in the Streamlit app, bronze daily/historical ingest notebooks, and shared `pipeline_utils` helpers.
+- **SinglePostAnalytics post exports**: Support for `SinglePostAnalytics_{Profile}_{id}.xlsx` (single `Post analytics` sheet) alongside legacy `PostAnalytics_{Profile}_{id}.xlsx` (`PERFORMANCE` + `TOP DEMOGRAPHICS`).
+- **Unit tests**: Additional cases for new filename patterns and `match_content_filename` / `match_post_filename` helpers (26 tests total).
+
+### Changed
+- **Dashboard refresh**: `LinkedIn Statistics.lvdash.json` aligned with the daily-use dashboard layout; dataset queries now target `gold.linkedin.fct_daily_profile_statistics` and `gold.linkedin.fct_daily_post_statistics`.
+- **Profile name handling**: `LINKEDIN_PROFILE_NAME` accepts Title Case names with spaces (validated separately from SQL-safe bundle parameters).
+
+### Fixed
+- **Post ingest**: Corrected `post_timedelta_str` reference on the legacy `PostAnalytics` path.
+- **Post patch ingest**: Fixed default-fallback variable name (`BRONZE_POST_PATCH_TABLE`).
+
+### Documentation
+- Updated `docs/data_sources.md` and `docs/dashboard_design.md` for new export formats and dashboard gold-table mapping.
+
+---
+
 ## [2026-02-19]
 
 ### Added

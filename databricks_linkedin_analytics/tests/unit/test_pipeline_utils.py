@@ -6,7 +6,16 @@ from datetime import date
 
 # Add src to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
-from linkedin_analytics_jobs.utils.pipeline_utils import get_valid_parameter_value, fill_missing_dates
+from linkedin_analytics_jobs.utils.pipeline_utils import (
+    get_valid_parameter_value,
+    fill_missing_dates,
+    remove_spaces,
+    ensure_spaces,
+    get_valid_profile_name,
+    match_content_filename,
+    match_post_filename,
+    profile_name_variants,
+)
 
 from unittest.mock import MagicMock, patch
 
@@ -60,3 +69,101 @@ def test_fill_missing_dates(mock_spark):
     assert result == mock_filled_df
     mock_unique_keys_df.crossJoin.assert_called_once_with(mock_date_seq_df)
     mock_unique_keys_df.crossJoin.return_value.join.assert_called()
+
+def test_remove_spaces():
+    assert remove_spaces("Your Profile Name Here") == "YourProfileNameHere"
+
+def test_ensure_spaces():
+    assert ensure_spaces("YourProfileNameHere") == "Your Profile Name Here"
+    assert ensure_spaces("Your Profile Name Here") == "Your Profile Name Here"
+
+def test_get_valid_profile_name_accepts_spaces():
+    assert get_valid_profile_name("Your Profile Name Here") == "Your Profile Name Here"
+
+def test_get_valid_profile_name_accepts_compact():
+    assert get_valid_profile_name("YourProfileNameHere") == "Your Profile Name Here"
+
+def test_profile_name_variants_equivalent():
+    spaced, compact = profile_name_variants("Your Profile Name Here")
+    assert spaced == "Your Profile Name Here"
+    assert compact == "YourProfileNameHere"
+    assert profile_name_variants("YourProfileNameHere") == (spaced, compact)
+
+def test_get_valid_profile_name_rejects_semicolon():
+    with pytest.raises(ValueError, match="Invalid characters"):
+        get_valid_profile_name("bad;name")
+
+def test_match_content_filename_daily_aggregate():
+    matched, d1, d2, fmt = match_content_filename(
+        "AggregateAnalytics_Your Profile Name Here_2026-06-18_2026-06-18.xlsx",
+        "Your Profile Name Here",
+        require_same_dates=True,
+    )
+    assert matched is True
+    assert d1 == "2026-06-18"
+    assert d2 == "2026-06-18"
+    assert fmt == "aggregate_analytics"
+
+def test_match_content_filename_daily_legacy():
+    matched, d1, d2, fmt = match_content_filename(
+        "Content_2025-08-01_2025-08-01_YourProfileNameHere.xlsx",
+        "Your Profile Name Here",
+        require_same_dates=True,
+    )
+    assert matched is True
+    assert fmt == "content"
+
+def test_match_content_filename_historical_different_dates():
+    matched, d1, d2, fmt = match_content_filename(
+        "Content_2024-08-17_2025-08-16_YourProfileNameHere.xlsx",
+        "Your Profile Name Here",
+        require_same_dates=False,
+    )
+    assert matched is True
+    assert d1 == "2024-08-17"
+    assert d2 == "2025-08-16"
+
+def test_match_post_filename_single_post():
+    matched, post_id, fmt = match_post_filename(
+        "SinglePostAnalytics_Your Profile Name Here_7472468010083958784.xlsx",
+        "Your Profile Name Here",
+    )
+    assert matched is True
+    assert post_id == "7472468010083958784"
+    assert fmt == "single_post_analytics"
+
+def test_match_content_filename_daily_aggregate_compact_profile():
+    matched, d1, d2, fmt = match_content_filename(
+        "AggregateAnalytics_Your Profile Name Here_2026-06-18_2026-06-18.xlsx",
+        "YourProfileNameHere",
+        require_same_dates=True,
+    )
+    assert matched is True
+    assert fmt == "aggregate_analytics"
+
+def test_match_content_filename_daily_legacy_compact_profile():
+    matched, _, _, fmt = match_content_filename(
+        "Content_2025-08-01_2025-08-01_YourProfileNameHere.xlsx",
+        "YourProfileNameHere",
+        require_same_dates=True,
+    )
+    assert matched is True
+    assert fmt == "content"
+
+def test_match_post_filename_single_post_compact_profile():
+    matched, post_id, fmt = match_post_filename(
+        "SinglePostAnalytics_Your Profile Name Here_7472468010083958784.xlsx",
+        "YourProfileNameHere",
+    )
+    assert matched is True
+    assert post_id == "7472468010083958784"
+    assert fmt == "single_post_analytics"
+
+def test_match_post_filename_legacy_with_suffix():
+    matched, post_id, fmt = match_post_filename(
+        "PostAnalytics_YourProfileNameHere_7372453867575283712 (1).xlsx",
+        "Your Profile Name Here",
+    )
+    assert matched is True
+    assert post_id == "7372453867575283712"
+    assert fmt == "post_analytics"

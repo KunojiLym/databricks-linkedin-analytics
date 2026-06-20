@@ -38,7 +38,7 @@ Alternative: push notebooks and resources via CLI
 Running notebooks locally (lightweight)
 - Notebooks expect Spark; local runs are useful for small parameterized tests using `papermill`:
 
-    papermill "src/linkedin_analytics_jobs/1. bronze ingestion/bronze daily ingest.ipynb" output.ipynb -p LINKEDIN_PROFILE_NAME "your_profile"
+    papermill "src/linkedin_analytics_jobs/1. bronze ingestion/bronze daily ingest.ipynb" output.ipynb -p LINKEDIN_PROFILE_NAME "Your Profile Name Here"
 
 - For full runs, execute notebooks on a Databricks cluster (via Jobs or interactive runs).
 
@@ -54,13 +54,14 @@ Example (your local dev override)
 
 ```json
 {
-  "linkedin_profile_name": "YourProfileNameHere",
+  "linkedin_profile_name": "Your Profile Name Here",
   "warehouse_id": "your_warehouse_id_here",
   "pipeline_runner": "your_pipeline_runner_name_here"
 }
 ```
 
 Guidance
+- `linkedin_profile_name` accepts either spaced (`Your Profile Name Here`) or compact (`YourProfileNameHere`) form; both match legacy and current export filenames.
 - Do not commit secrets or tokens into this file. If you need to store secrets for CI or shared environments, use secret stores (Databricks secrets, environment variables, or CI secrets).
 - If you keep a local `variable-overrides.json` for convenience, add `.databricks/bundle/*/variable-overrides.json` to your global or repo `.gitignore` to avoid accidental commits.
 - For production deployments, prefer passing variables via secure CI/CD pipelines or Databricks workspace variables instead of committing overrides in the repo.
