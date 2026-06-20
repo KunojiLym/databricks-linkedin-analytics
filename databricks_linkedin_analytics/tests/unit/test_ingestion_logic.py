@@ -35,3 +35,16 @@ def test_lowercase_prefix():
     # Regex is case sensitive: ^Content_...
     validator = FilenameValidator("content_2023-10-27_2023-10-27_MyProfile.xlsx")
     assert validator.is_valid_format() == False
+
+def test_valid_aggregate_analytics_filename():
+    validator = FilenameValidator("AggregateAnalytics_My Profile_2026-06-18_2026-06-18.xlsx")
+    assert validator.is_valid_format() is True
+    assert validator.detected_format == 'aggregate_analytics'
+
+def test_aggregate_analytics_mismatched_dates():
+    validator = FilenameValidator("AggregateAnalytics_My Profile_2026-06-18_2026-06-19.xlsx")
+    assert validator.is_valid_format() is False
+
+def test_unknown_prefix_invalid():
+    validator = FilenameValidator("Unknown_2026-06-18_2026-06-18_MyProfile.xlsx")
+    assert validator.is_valid_format() is False

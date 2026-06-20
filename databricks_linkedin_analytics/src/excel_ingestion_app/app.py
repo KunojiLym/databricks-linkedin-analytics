@@ -25,7 +25,11 @@ if uploaded_files:
             # 1. Validate Filename
             validator = FilenameValidator(uploaded_file.name)
             if not validator.is_valid_format():
-                st.error(f"❌ Invalid filename format. Expected: Content_YYYY-MM-DD_YYYY-MM-DD_ProfileName.xlsx")
+                st.error(
+                    "❌ Invalid filename format. Expected one of:\n"
+                    "- AggregateAnalytics_{Profile Name}_YYYY-MM-DD_YYYY-MM-DD.xlsx\n"
+                    "- Content_YYYY-MM-DD_YYYY-MM-DD_ProfileName.xlsx"
+                )
                 continue
 
             # 2. Validate Content (Sheets)

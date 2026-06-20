@@ -17,7 +17,8 @@ Maps to the following post in [Build Your Own LinkedIn Analytics](https://www.yz
 - Ensure the gold tables exist and permissions allow the dashboard's query engine to read them
 
 ## Examples
-- Use `fct_daily_post_statistics` for per-post metrics and `fct_daily_profile_statistics` for profile-level KPIs
+- Per-post dashboard datasets query `gold.linkedin.fct_daily_profile_statistics` (excluding `others` and `total` rollup rows), with `post_id` aliased as `short_link` and `days_since_post` as `days_after_post`.
+- Profile-level daily totals use `gold.linkedin.fct_daily_post_statistics` (`analytics_date`, `impressions`, `engagements`, `new_followers`).
 - Add pre-aggregated tiles for rolling 7-day averages to improve dashboard responsiveness
 
 ## Operational notes
