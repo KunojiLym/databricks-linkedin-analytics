@@ -230,3 +230,21 @@ __marimo__/
 
 .idea/
 uv.lock
+
+# graphify build artifacts (unified graph lives at LinkedInDatabricks workspace root)
+graphify-out/
+
+# Local agent tooling (not part of the public example)
+.claude/
+.cursor/rules/graphify.mdc
+/CLAUDE.md
+
+# graphify sidecar build artifacts (regenerate with /databricks-graphify)
+*.ipynb.py
+*.ipynb.md
+*.ipynb.sql
+*.ipynb.sh
+*.ipynb.scala
+*.ipynb.r
+*.lvdash.sql
+*.lvdash.md
