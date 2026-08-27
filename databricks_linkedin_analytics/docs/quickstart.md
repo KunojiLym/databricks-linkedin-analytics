@@ -2,10 +2,11 @@
 
 This quickstart gives exact commands and environment overview to deploy the `databricks_linkedin_analytics` bundle to a Databricks development workspace and run notebooks locally when applicable.
 
-Related blog posts: Part 10 (Orchestrating and Automating the Pipeline)
+Related blog post: [Part 8: Orchestrating and Automating the Pipeline](https://www.yzouyang.com/build-your-own-linkedin-analytics-part-8-orchestrating-and-automating-the-pipeline/)
 
 Prerequisites
-- Databricks CLI installed and configured: `databricks configure --token` (or use a named profile)
+- Databricks CLI installed and authenticated: `databricks auth login --host <workspace-url>` (or a named profile)
+- Optional: personal access token via `DATABRICKS_HOST` / `DATABRICKS_TOKEN` (see [CLI authentication](https://docs.databricks.com/aws/en/dev-tools/cli/authentication))
 - Optional: `dbx` (Databricks CI/CD tool) installed for advanced deployments
 - `papermill` or `nbconvert` if you want to execute notebooks locally
 
@@ -16,12 +17,16 @@ Environment variables (recommended)
 - Optional override variables referenced in `resources/variables.yml` (e.g., catalogs, schemas, volumes)
 
 Quick deploy (Databricks Bundle)
+
+`databricks.yml` lives in `databricks_linkedin_analytics/`. From the **repository root**:
+
 1. Authenticate the CLI:
 
-    databricks configure --token
+    databricks auth login --host <workspace-url>
 
 2. Deploy the bundle to the `dev` target (development mode):
 
+    cd databricks_linkedin_analytics
     databricks bundle deploy --target dev
 
 Notes:
@@ -82,8 +87,10 @@ uv sync
 uv run pytest
 ```
 
+CI installs dependencies from the repository-root `pyproject.toml` (`uv sync` at the repo root) and then runs `uv run pytest tests/unit` in `databricks_linkedin_analytics/`. Either flow is valid.
+
 ### CI/CD
-A GitHub Actions workflow (`.github/workflows/ci_cd_bundle.yml`) automatically runs tests and validates bundle syntax on every pull request.
+A GitHub Actions workflow (`.github/workflows/ci_cd_bundle.yml`) always runs unit tests on pull requests and on `main`. Bundle validate and deploy steps run only when the `DATABRICKS_HOST` and `DATABRICKS_TOKEN` repository secrets are set; they are skipped (the workflow still succeeds) when those secrets are empty. This repository does not ship Databricks credentials.
 
 ## Configuration
 - Bundle targets and environment settings: `databricks_linkedin_analytics/databricks.yml`

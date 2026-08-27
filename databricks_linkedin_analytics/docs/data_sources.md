@@ -8,7 +8,7 @@ Maps to the following posts in [Build Your Own LinkedIn Analytics](https://www.y
 This project ingests LinkedIn profile and content metrics exported as Excel/CSV files and optionally via LinkedIn APIs where available. The repository includes example notebooks and configuration for both daily and historical ingestion.
 
 ## Relevant files
-- Ingestion POC: `src/linkedin_analytics_jobs/0. poc and utility/linkedin_pipeline_poc.ipynb`
+- Ingestion POC: `src/linkedin_analytics_jobs/0. poc/linkedin_pipeline_poc.ipynb`
 - Landing schema and volumes: `resources/schemas.yml`
 - Variable defaults: `resources/variables.yml`
 

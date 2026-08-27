@@ -14,13 +14,18 @@ This repo contains a Databricks asset bundle (`databricks_linkedin_analytics/`) 
 
 Quick example — deploy a development copy of the bundle (Databricks CLI / bundle tooling required)
 
-```powershell
+```bash
 # Authenticate the CLI (if not already configured)
-databricks configure --token
+databricks auth login --host <workspace-url>
+
+# Bundle config lives in the subdirectory that contains databricks.yml
+cd databricks_linkedin_analytics
 
 # Deploy the Databricks asset bundle to the 'dev' target
 databricks bundle deploy --target dev
 ```
+
+Personal access tokens and `DATABRICKS_HOST` / `DATABRICKS_TOKEN` environment variables remain optional; see [Databricks CLI authentication](https://docs.databricks.com/aws/en/dev-tools/cli/authentication).
 
 ## Repository guidance
 - Code-first: open the notebooks in `databricks_linkedin_analytics/src/` and SQL files under `src/.../3. gold modelling/` for concrete logic.
