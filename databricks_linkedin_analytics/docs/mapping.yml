@@ -1,7 +1,7 @@
 # Mapping: blog parts → docs → repo files
 
 part2: { doc: docs/architecture.md, blog: "Part 2", files: ["databricks.yml", "resources/schemas.yml"] }
-part3: { doc: docs/data_sources.md, blog: "Part 3", files: ["src/.../0. poc and utility/linkedin_pipeline_poc.ipynb", "resources/variables.yml"] }
+part3: { doc: docs/data_sources.md, blog: "Part 3", files: ["src/.../0. poc/linkedin_pipeline_poc.ipynb", "resources/variables.yml"] }
 part4: { doc: docs/ingestion.md, blog: "Part 4", files: ["src/linkedin_analytics_jobs/1. bronze ingestion/*"] }
 part5: { doc: docs/transformation.md, blog: "Part 5", files: ["src/linkedin_analytics_jobs/2. silver transformation/*"] }
 part6: { doc: docs/modeling.md, blog: "Part 6", files: ["src/linkedin_analytics_jobs/3. gold modelling/pipeline_gold_create/*.sql"] }

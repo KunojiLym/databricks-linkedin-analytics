@@ -4,6 +4,18 @@ All notable changes to this repository will be documented in this file.
 
 Format follows a simple dated "YYYY-MM-DD" style. Add a dated section when changes are merged; use `Unreleased` only if you later adopt a formal release workflow.
 
+## [2026-08-27]
+
+### Fixed
+- **Getting started**: Root and quickstart deploy snippets now `cd databricks_linkedin_analytics` before `databricks bundle deploy`, so clone-and-follow from the repository root finds `databricks.yml`.
+- **CLI auth**: Replaced leftover `databricks configure --token` with `databricks auth login --host <workspace-url>`; PAT / env vars remain optional.
+- **Bundle README and pyproject**: Replaced leftover DAB Python template copy (sample job, template ETL pipeline name, `(2025)` title, missing `databricks_linkedin_analytics.main` package) with accurate pointers to `docs/quickstart.md`, `resources/jobs.yml`, and `resources/pipelines.yml`. Inner hatch packaging now ships `src/linkedin_analytics_jobs` and `src/excel_ingestion_app`.
+- **POC path**: Corrected `docs/data_sources.md` and `docs/mapping.yml` to `src/linkedin_analytics_jobs/0. poc/linkedin_pipeline_poc.ipynb`.
+- **Blog pointer**: Quickstart now links Part 8 (orchestration); Part 10 is observability.
+- **CI docs**: Documented that unit tests always run; bundle validate/deploy run only when Databricks secrets are set.
+
+---
+
 ## [2026-06-20]
 
 ### Added
